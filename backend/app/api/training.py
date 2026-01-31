@@ -221,8 +221,12 @@ async def gradient_point_step():
     
     idx = state["point_by_point"]["current_index"]
     
+    # Dacă am terminat toate punctele, resetează automat pentru următoarea epocă
     if idx >= n:
-        raise HTTPException(status_code=400, detail="All points processed. Reset to start again.")
+        state["point_by_point"]["current_index"] = 0
+        state["point_by_point"]["accumulated_dw"] = 0.0
+        state["point_by_point"]["accumulated_db"] = 0.0
+        idx = 0
     
     w = state["model"]["w"]
     b = state["model"]["b"]

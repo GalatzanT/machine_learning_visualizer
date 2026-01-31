@@ -11,9 +11,14 @@ class DatasetService:
     """Service pentru încărcare și generare datasets"""
     
     @staticmethod
-    def load_from_csv(content: bytes) -> Tuple[np.ndarray, np.ndarray]:
+    def load_from_csv(content) -> Tuple[np.ndarray, np.ndarray]:
         """Încarcă dataset din CSV."""
-        df = pd.read_csv(io.StringIO(content.decode('utf-8')))
+        # Acceptă fie bytes fie BytesIO
+        if isinstance(content, bytes):
+            df = pd.read_csv(io.StringIO(content.decode('utf-8')))
+        else:
+            # content e deja BytesIO
+            df = pd.read_csv(content)
         
         if len(df.columns) < 2:
             raise ValueError("CSV must have at least 2 columns")
