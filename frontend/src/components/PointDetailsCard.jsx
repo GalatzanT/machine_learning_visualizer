@@ -56,13 +56,9 @@ export const PointDetailsCard = ({ currentPointData }) => {
         >
           <h3>{TEXT.GRADIENT_CONTRIBUTION}</h3>
           <div style={{ fontFamily: "monospace", fontSize: "16px" }}>
-            <strong>
-              ∂w = {currentPointData.contribution_w.toFixed(6)}
-            </strong>
+            <strong>∂w = {currentPointData.contribution_w.toFixed(6)}</strong>
             <br />
-            <strong>
-              ∂b = {currentPointData.contribution_b.toFixed(6)}
-            </strong>
+            <strong>∂b = {currentPointData.contribution_b.toFixed(6)}</strong>
             <br />
             <div style={{ marginTop: "10px", fontSize: "14px", color: "#666" }}>
               {TEXT.ACCUMULATED}:

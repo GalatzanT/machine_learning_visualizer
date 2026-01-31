@@ -7,12 +7,17 @@ export const datasetAPI = {
   upload: async (file) => {
     const formData = new FormData();
     formData.append("file", file);
-    const response = await axios.post(`${API_URL}/api/dataset/upload`, formData);
+    const response = await axios.post(
+      `${API_URL}/api/dataset/upload`,
+      formData,
+    );
     return response.data;
   },
 
   generate: async (type) => {
-    const response = await axios.post(`${API_URL}/api/dataset/generate/${type}`);
+    const response = await axios.post(
+      `${API_URL}/api/dataset/generate/${type}`,
+    );
     return response.data;
   },
 

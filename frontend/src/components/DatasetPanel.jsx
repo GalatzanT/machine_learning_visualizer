@@ -22,10 +22,7 @@ export const DatasetPanel = ({ fileInputRef, onFileUpload, onGenerate }) => {
           >
             {TEXT.GENERATE_SIMPLE}
           </button>
-          <button
-            className="btn-secondary"
-            onClick={() => onGenerate("noisy")}
-          >
+          <button className="btn-secondary" onClick={() => onGenerate("noisy")}>
             {TEXT.GENERATE_NOISY}
           </button>
           <button

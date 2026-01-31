@@ -28,8 +28,7 @@ export const FreezeExplainPanel = ({ freezeData, onContinue }) => {
         <div style={{ marginTop: "10px" }}>
           n = {freezeData.mse_breakdown.n}
           <br />
-          Σ(yᵢ - ŷᵢ)² ={" "}
-          {freezeData.mse_breakdown.sum_squared_errors.toFixed(4)}
+          Σ(yᵢ - ŷᵢ)² = {freezeData.mse_breakdown.sum_squared_errors.toFixed(4)}
           <br />
           <strong>MSE = {freezeData.mse_breakdown.mse_value.toFixed(4)}</strong>
         </div>

@@ -34,7 +34,9 @@ export const useTraining = () => {
       setFreezeMode(false);
       alert(`✅ ${TEXT.DATASET_LOADED}: ${data.num_points} ${TEXT.POINTS}`);
     } catch (error) {
-      alert(`${TEXT.ERROR_MESSAGE}: ${error.response?.data?.detail || error.message}`);
+      alert(
+        `${TEXT.ERROR_MESSAGE}: ${error.response?.data?.detail || error.message}`,
+      );
     }
   };
 
@@ -49,7 +51,9 @@ export const useTraining = () => {
       setFreezeMode(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
     } catch (error) {
-      alert(`${TEXT.ERROR_MESSAGE}: ${error.response?.data?.detail || error.message}`);
+      alert(
+        `${TEXT.ERROR_MESSAGE}: ${error.response?.data?.detail || error.message}`,
+      );
     }
   };
 
@@ -68,7 +72,9 @@ export const useTraining = () => {
       setExplanations(data.explanations);
       setFreezeMode(false);
     } catch (error) {
-      alert(`${TEXT.ERROR_MESSAGE}: ${error.response?.data?.detail || error.message}`);
+      alert(
+        `${TEXT.ERROR_MESSAGE}: ${error.response?.data?.detail || error.message}`,
+      );
     }
   };
 
@@ -78,7 +84,9 @@ export const useTraining = () => {
       const data = await trainingAPI.setLearningRate(newLr);
       setLrWarning(data.warnings.length > 0 ? data.warnings : null);
     } catch (error) {
-      alert(`${TEXT.ERROR_MESSAGE}: ${error.response?.data?.detail || error.message}`);
+      alert(
+        `${TEXT.ERROR_MESSAGE}: ${error.response?.data?.detail || error.message}`,
+      );
     }
   };
 
@@ -93,7 +101,9 @@ export const useTraining = () => {
       setFreezeData(data);
       setFreezeMode(true);
     } catch (error) {
-      alert(`${TEXT.ERROR_MESSAGE}: ${error.response?.data?.detail || error.message}`);
+      alert(
+        `${TEXT.ERROR_MESSAGE}: ${error.response?.data?.detail || error.message}`,
+      );
     }
   };
 
@@ -111,7 +121,9 @@ export const useTraining = () => {
       setIsAutoPlaying(false);
       if (autoPlayRef.current) clearInterval(autoPlayRef.current);
     } catch (error) {
-      alert(`${TEXT.ERROR_MESSAGE}: ${error.response?.data?.detail || error.message}`);
+      alert(
+        `${TEXT.ERROR_MESSAGE}: ${error.response?.data?.detail || error.message}`,
+      );
     }
   };
 
@@ -132,7 +144,9 @@ export const useTraining = () => {
       if (autoPlayRef.current) clearInterval(autoPlayRef.current);
       if (fileInputRef.current) fileInputRef.current.value = "";
     } catch (error) {
-      alert(`${TEXT.ERROR_MESSAGE}: ${error.response?.data?.detail || error.message}`);
+      alert(
+        `${TEXT.ERROR_MESSAGE}: ${error.response?.data?.detail || error.message}`,
+      );
     }
   };
 
@@ -165,7 +179,9 @@ export const useTraining = () => {
         }
       }
     } catch (error) {
-      alert(`${TEXT.ERROR_MESSAGE}: ${error.response?.data?.detail || error.message}`);
+      alert(
+        `${TEXT.ERROR_MESSAGE}: ${error.response?.data?.detail || error.message}`,
+      );
       setIsAutoPlaying(false);
       if (autoPlayRef.current) {
         clearInterval(autoPlayRef.current);
@@ -200,7 +216,9 @@ export const useTraining = () => {
         autoPlayRef.current = null;
       }
     } catch (error) {
-      alert(`${TEXT.ERROR_MESSAGE}: ${error.response?.data?.detail || error.message}`);
+      alert(
+        `${TEXT.ERROR_MESSAGE}: ${error.response?.data?.detail || error.message}`,
+      );
     }
   };
 

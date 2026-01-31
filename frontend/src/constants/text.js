@@ -55,7 +55,7 @@ export const TEXT = {
   FREEZE_MODE_TITLE: "❄️ Freeze & Explain Mode",
   MSE_FORMULA: "📐 MSE Formula (Mean Squared Error)",
   GRADIENT_FORMULA: "📉 Gradient Formula",
-  
+
   // Contributions Table
   CONTRIBUTIONS_TITLE: "🎯 Gradient Contributions",
   POINT_INDEX: "Point",
