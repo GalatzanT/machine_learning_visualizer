@@ -2,7 +2,7 @@
 API Routes pentru training și gradient descent
 """
 from fastapi import APIRouter, HTTPException
-from app.models.schemas import GradientStepResponse, FreezeStateResponse, LearningRateConfig, LearningRateResponse
+from app.models.schemas import GradientStepResponse, FreezeStateResponse, LearningRateConfig, LearningRateResponse, PointStepResponse
 from app.services.ml_service import MLService
 from app.services.explanation_service import ExplanationService
 import numpy as np
@@ -14,7 +14,13 @@ state = {
     "data": {"x": None, "y": None},
     "model": {"w": 1.0, "b": 1.0},
     "history": {"loss": [], "w": [], "b": []},
-    "config": {"lr": 0.01, "current_epoch": 0}
+    "config": {"lr": 0.01, "current_epoch": 0},
+    "point_by_point": {
+        "active": False,
+        "current_index": 0,
+        "accumulated_dw": 0.0,
+        "accumulated_db": 0.0
+    }
 }
 
 ml_service = MLService()
@@ -180,6 +186,10 @@ async def reset_model():
     state["history"]["w"] = []
     state["history"]["b"] = []
     state["config"]["current_epoch"] = 0
+    state["point_by_point"]["active"] = False
+    state["point_by_point"]["current_index"] = 0
+    state["point_by_point"]["accumulated_dw"] = 0.0
+    state["point_by_point"]["accumulated_db"] = 0.0
     
     return {
         "message": "Model reset to initial state",
@@ -187,3 +197,122 @@ async def reset_model():
         "b": state["model"]["b"],
         "learning_rate": state["config"]["lr"]
     }
+
+
+@router.post("/gradient/point-step", response_model=PointStepResponse)
+async def gradient_point_step():
+    """
+    Procesează un singur punct din dataset în modul pas cu pas.
+    Returnează detalii despre contribuția acestui punct la gradient.
+    """
+    if state["data"]["x"] is None:
+        raise HTTPException(status_code=400, detail="No dataset loaded")
+    
+    x = state["data"]["x"]
+    y = state["data"]["y"]
+    n = len(x)
+    
+    # Inițializează modul pas cu pas dacă nu e activ
+    if not state["point_by_point"]["active"]:
+        state["point_by_point"]["active"] = True
+        state["point_by_point"]["current_index"] = 0
+        state["point_by_point"]["accumulated_dw"] = 0.0
+        state["point_by_point"]["accumulated_db"] = 0.0
+    
+    idx = state["point_by_point"]["current_index"]
+    
+    if idx >= n:
+        raise HTTPException(status_code=400, detail="All points processed. Reset to start again.")
+    
+    w = state["model"]["w"]
+    b = state["model"]["b"]
+    lr = state["config"]["lr"]
+    
+    # Calculează pentru punctul curent
+    xi = x[idx]
+    yi = y[idx]
+    y_pred = w * xi + b
+    error = yi - y_pred
+    
+    # Contribuția acestui punct la gradient
+    contribution_w = -(2/n) * xi * error
+    contribution_b = -(2/n) * error
+    
+    # Acumulează gradienții
+    state["point_by_point"]["accumulated_dw"] += contribution_w
+    state["point_by_point"]["accumulated_db"] += contribution_b
+    
+    # Verifică dacă e ultimul punct
+    is_last = (idx == n - 1)
+    
+    w_new = None
+    b_new = None
+    error_categories = None
+    error_magnitudes_list = None
+    
+    if is_last:
+        # Update parametri
+        w_new = w - lr * state["point_by_point"]["accumulated_dw"]
+        b_new = b - lr * state["point_by_point"]["accumulated_db"]
+        
+        # Actualizează modelul
+        state["model"]["w"] = w_new
+        state["model"]["b"] = b_new
+        state["config"]["current_epoch"] += 1
+        
+        # Calculează loss final și categorii de eroare
+        y_pred_all = ml_service.calculate_predictions(x, w_new, b_new)
+        loss = ml_service.calculate_mse(y, y_pred_all)
+        
+        # Calculează categorii de eroare pentru colorare
+        errors, error_magnitudes = ml_service.calculate_errors_per_point(y, y_pred_all)
+        error_categories = ml_service.categorize_errors(error_magnitudes)
+        error_magnitudes_list = error_magnitudes.tolist()
+        
+        state["history"]["loss"].append(float(loss))
+        state["history"]["w"].append(float(w_new))
+        state["history"]["b"].append(float(b_new))
+        
+        # Reset pentru următoarea epocă
+        state["point_by_point"]["active"] = False
+        state["point_by_point"]["current_index"] = 0
+        state["point_by_point"]["accumulated_dw"] = 0.0
+        state["point_by_point"]["accumulated_db"] = 0.0
+        
+        explanation = f"✅ Epocă {state['config']['current_epoch']} completă! Parametri actualizați: w={w_new:.4f}, b={b_new:.4f}"
+    else:
+        # Avansează la următorul punct
+        state["point_by_point"]["current_index"] += 1
+        explanation = f"Punct {idx+1}/{n}: eroare={error:.4f}, contribuție_w={contribution_w:.6f}, contribuție_b={contribution_b:.6f}"
+    
+    return PointStepResponse(
+        point_index=idx,
+        total_points=n,
+        x_value=float(xi),
+        y_actual=float(yi),
+        y_predicted=float(y_pred),
+        error=float(error),
+        contribution_w=float(contribution_w),
+        contribution_b=float(contribution_b),
+        accumulated_gradient_w=float(state["point_by_point"]["accumulated_dw"]),
+        accumulated_gradient_b=float(state["point_by_point"]["accumulated_db"]),
+        is_last_point=is_last,
+        w_current=float(w),
+        b_current=float(b),
+        w_new=float(w_new) if w_new is not None else None,
+        b_new=float(b_new) if b_new is not None else None,
+        explanation=explanation,
+        error_categories=error_categories,
+        error_magnitudes=error_magnitudes_list
+    )
+
+
+@router.post("/gradient/point-reset")
+async def reset_point_mode():
+    """Resetează modul pas cu pas fără a reseta modelul."""
+    state["point_by_point"]["active"] = False
+    state["point_by_point"]["current_index"] = 0
+    state["point_by_point"]["accumulated_dw"] = 0.0
+    state["point_by_point"]["accumulated_db"] = 0.0
+    
+    return {"message": "Point-by-point mode reset"}

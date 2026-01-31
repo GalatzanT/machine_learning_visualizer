@@ -30,6 +30,28 @@ class DatasetInfoResponse(BaseModel):
     is_loaded: bool
 
 
+class PointStepResponse(BaseModel):
+    """Response pentru procesarea unui singur punct."""
+    point_index: int
+    total_points: int
+    x_value: float
+    y_actual: float
+    y_predicted: float
+    error: float
+    contribution_w: float
+    contribution_b: float
+    accumulated_gradient_w: float
+    accumulated_gradient_b: float
+    is_last_point: bool
+    w_current: float
+    b_current: float
+    w_new: Optional[float] = None  # Doar la ultimul punct
+    b_new: Optional[float] = None  # Doar la ultimul punct
+    explanation: str
+    error_categories: Optional[List[str]] = None  # Doar la ultimul punct
+    error_magnitudes: Optional[List[float]] = None  # Doar la ultimul punct
+
+
 class LearningRateConfig(BaseModel):
     learning_rate: float
 

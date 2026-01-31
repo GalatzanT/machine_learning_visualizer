@@ -36,6 +36,12 @@ function App() {
   const [freezeData, setFreezeData] = useState(null);
   const fileInputRef = useRef(null);
 
+  // State pentru modul pas cu pas
+  const [pointByPointMode, setPointByPointMode] = useState(false);
+  const [currentPointData, setCurrentPointData] = useState(null);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(false);
+  const autoPlayRef = useRef(null);
+
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -133,6 +139,78 @@ function App() {
       setExplanations([]);
       setFreezeMode(false);
       setFreezeData(null);
+      setPointByPointMode(false);
+      setCurrentPointData(null);
+      setIsAutoPlaying(false);
+      if (autoPlayRef.current) clearInterval(autoPlayRef.current);
+    } catch (error) {
+      alert("❌ Eroare: " + (error.response?.data?.detail || error.message));
+    }
+  };
+
+  const handlePointStep = async () => {
+    if (!dataset) {
+      alert("⚠️ Încarcă mai întâi un dataset!");
+      return;
+    }
+
+    try {
+      const response = await axios.post(`${API_URL}/api/gradient/point-step`);
+      setCurrentPointData(response.data);
+      setPointByPointMode(true);
+
+      if (response.data.is_last_point) {
+        setModel({ w: response.data.w_new, b: response.data.b_new });
+
+        // Setează categoriile de eroare pentru colorare
+        if (response.data.error_categories) {
+          setStepData({
+            error_categories: response.data.error_categories,
+            error_magnitudes: response.data.error_magnitudes,
+          });
+        }
+
+        setIsAutoPlaying(false);
+        if (autoPlayRef.current) {
+          clearInterval(autoPlayRef.current);
+          autoPlayRef.current = null;
+        }
+      }
+    } catch (error) {
+      alert("❌ Eroare: " + (error.response?.data?.detail || error.message));
+      setIsAutoPlaying(false);
+      if (autoPlayRef.current) {
+        clearInterval(autoPlayRef.current);
+        autoPlayRef.current = null;
+      }
+    }
+  };
+
+  const handleAutoPlay = () => {
+    if (isAutoPlaying) {
+      setIsAutoPlaying(false);
+      if (autoPlayRef.current) {
+        clearInterval(autoPlayRef.current);
+        autoPlayRef.current = null;
+      }
+    } else {
+      setIsAutoPlaying(true);
+      autoPlayRef.current = setInterval(() => {
+        handlePointStep();
+      }, 1000);
+    }
+  };
+
+  const handleResetPointMode = async () => {
+    try {
+      await axios.post(`${API_URL}/api/gradient/point-reset`);
+      setPointByPointMode(false);
+      setCurrentPointData(null);
+      setIsAutoPlaying(false);
+      if (autoPlayRef.current) {
+        clearInterval(autoPlayRef.current);
+        autoPlayRef.current = null;
+      }
     } catch (error) {
       alert("❌ Eroare: " + (error.response?.data?.detail || error.message));
     }
@@ -168,9 +246,35 @@ function App() {
         backgroundColor:
           stepData && stepData.error_categories
             ? stepData.error_categories.map((cat) => getPointColor(cat))
-            : "rgba(54, 162, 235, 0.6)",
-        pointRadius: 8,
+            : dataset && currentPointData
+              ? dataset.x.map(
+                  (_, i) =>
+                    i === currentPointData.point_index
+                      ? "rgba(255, 0, 0, 1)" // Punct activ - roșu
+                      : "rgba(54, 162, 235, 0.3)", // Celelalte puncte - transparent
+                )
+              : "rgba(54, 162, 235, 0.6)",
+        pointRadius:
+          dataset && currentPointData
+            ? dataset.x.map((_, i) =>
+                i === currentPointData.point_index ? 15 : 8,
+              )
+            : 8,
         pointHoverRadius: 10,
+        borderColor:
+          dataset && currentPointData
+            ? dataset.x.map((_, i) =>
+                i === currentPointData.point_index
+                  ? "rgba(255, 0, 0, 1)"
+                  : "rgba(54, 162, 235, 1)",
+              )
+            : "rgba(54, 162, 235, 1)",
+        borderWidth:
+          dataset && currentPointData
+            ? dataset.x.map((_, i) =>
+                i === currentPointData.point_index ? 3 : 1,
+              )
+            : 1,
       },
       {
         label: "Linie Regresie",
@@ -205,7 +309,7 @@ function App() {
       tooltip: {
         callbacks: {
           afterLabel: function (context) {
-            if (stepData && context.datasetIndex === 0) {
+            if (stepData && stepData.errors && context.datasetIndex === 0) {
               const idx = context.dataIndex;
               const error = stepData.errors[idx];
               const magnitude = stepData.error_magnitudes[idx];
@@ -227,11 +331,14 @@ function App() {
   };
 
   const lossData = {
-    labels: stepData ? stepData.loss_history.map((_, i) => i + 1) : [],
+    labels:
+      stepData && stepData.loss_history
+        ? stepData.loss_history.map((_, i) => i + 1)
+        : [],
     datasets: [
       {
         label: "Loss (MSE)",
-        data: stepData ? stepData.loss_history : [],
+        data: stepData && stepData.loss_history ? stepData.loss_history : [],
         borderColor: "rgba(75, 192, 192, 1)",
         backgroundColor: "rgba(75, 192, 192, 0.2)",
         tension: 0.1,
@@ -343,6 +450,45 @@ function App() {
             🗑️ Reset Tot
           </button>
         </div>
+
+        <div
+          className="control-group"
+          style={{
+            borderTop: "2px solid #007bff",
+            paddingTop: "15px",
+            marginTop: "15px",
+          }}
+        >
+          <label>🔍 Mod Pas cu Pas (Punct cu Punct)</label>
+          <div className="button-group">
+            <button
+              className="btn-primary"
+              onClick={handlePointStep}
+              disabled={!dataset || isAutoPlaying}
+              style={{ fontSize: "16px" }}
+            >
+              ➡️ Următorul Punct
+            </button>
+            <button
+              className="btn-secondary"
+              onClick={handleAutoPlay}
+              disabled={!dataset}
+              style={{
+                background: isAutoPlaying ? "#dc3545" : "#28a745",
+                color: "white",
+              }}
+            >
+              {isAutoPlaying ? "⏸️ Pauză" : "▶️ Auto Play"}
+            </button>
+            <button
+              className="btn-secondary"
+              onClick={handleResetPointMode}
+              disabled={!pointByPointMode}
+            >
+              🔄 Reset Mod
+            </button>
+          </div>
+        </div>
       </div>
 
       {dataset && (
@@ -351,6 +497,8 @@ function App() {
             Epocă: {currentEpoch} | Model: y = {model.w.toFixed(4)}·x +{" "}
             {model.b.toFixed(4)}
             {stepData &&
+              stepData.loss_after &&
+              stepData.gradient_magnitude &&
               ` | Loss: ${stepData.loss_after.toFixed(4)} | Gradient: ${stepData.gradient_magnitude.toFixed(4)}`}
           </div>
 
@@ -379,6 +527,135 @@ function App() {
                   {exp}
                 </div>
               ))}
+            </div>
+          )}
+
+          {pointByPointMode && currentPointData && (
+            <div
+              style={{
+                background: "#fff3cd",
+                padding: "20px",
+                borderRadius: "8px",
+                marginBottom: "20px",
+                border: "3px solid #ff9800",
+              }}
+            >
+              <h2>
+                🔍 Analiza Punctului {currentPointData.point_index + 1}/
+                {currentPointData.total_points}
+              </h2>
+
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: "15px",
+                  marginTop: "15px",
+                }}
+              >
+                <div
+                  style={{
+                    background: "white",
+                    padding: "15px",
+                    borderRadius: "8px",
+                  }}
+                >
+                  <h3>📊 Date Punct</h3>
+                  <div style={{ fontFamily: "monospace", fontSize: "16px" }}>
+                    <strong>x = {currentPointData.x_value.toFixed(4)}</strong>
+                    <br />
+                    <strong>
+                      y<sub>actual</sub> ={" "}
+                      {currentPointData.y_actual.toFixed(4)}
+                    </strong>
+                    <br />
+                    <strong style={{ color: "#007bff" }}>
+                      ŷ = {currentPointData.y_predicted.toFixed(4)}
+                    </strong>
+                    <br />
+                    <strong
+                      style={{
+                        color:
+                          currentPointData.error > 0 ? "#dc3545" : "#28a745",
+                      }}
+                    >
+                      Eroare = {currentPointData.error.toFixed(4)}
+                    </strong>
+                  </div>
+                </div>
+
+                <div
+                  style={{
+                    background: "white",
+                    padding: "15px",
+                    borderRadius: "8px",
+                  }}
+                >
+                  <h3>📈 Contribuție Gradient</h3>
+                  <div style={{ fontFamily: "monospace", fontSize: "16px" }}>
+                    <strong>
+                      ∂w = {currentPointData.contribution_w.toFixed(6)}
+                    </strong>
+                    <br />
+                    <strong>
+                      ∂b = {currentPointData.contribution_b.toFixed(6)}
+                    </strong>
+                    <br />
+                    <div
+                      style={{
+                        marginTop: "10px",
+                        fontSize: "14px",
+                        color: "#666",
+                      }}
+                    >
+                      Acumulat:
+                      <br />
+                      Σ∂w = {currentPointData.accumulated_gradient_w.toFixed(6)}
+                      <br />
+                      Σ∂b = {currentPointData.accumulated_gradient_b.toFixed(6)}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                style={{
+                  background: "white",
+                  padding: "15px",
+                  borderRadius: "8px",
+                  marginTop: "15px",
+                }}
+              >
+                <h3>💭 Explicație</h3>
+                <p style={{ fontSize: "14px", margin: 0 }}>
+                  {currentPointData.explanation}
+                </p>
+              </div>
+
+              {currentPointData.is_last_point && (
+                <div
+                  style={{
+                    background: "#d4edda",
+                    border: "2px solid #28a745",
+                    padding: "15px",
+                    borderRadius: "8px",
+                    marginTop: "15px",
+                  }}
+                >
+                  <h3>✅ Update Final</h3>
+                  <div style={{ fontFamily: "monospace", fontSize: "16px" }}>
+                    <strong>
+                      w: {currentPointData.w_current.toFixed(4)} →{" "}
+                      {currentPointData.w_new.toFixed(4)}
+                    </strong>
+                    <br />
+                    <strong>
+                      b: {currentPointData.b_current.toFixed(4)} →{" "}
+                      {currentPointData.b_new.toFixed(4)}
+                    </strong>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
@@ -481,7 +758,7 @@ function App() {
               <Scatter data={scatterData} options={scatterOptions} />
             </div>
 
-            {stepData && (
+            {stepData && stepData.loss_history && (
               <div className="chart-container">
                 <h2>📈 Evoluția Loss-ului</h2>
                 <Line data={lossData} options={chartOptions} />
