@@ -46,6 +46,7 @@ function App() {
     pointByPointMode,
     currentPointData,
     isAutoPlaying,
+    playbackSpeed,
     fileInputRef,
     handleFileUpload,
     handleGenerateDataset,
@@ -56,6 +57,7 @@ function App() {
     handleResetAll,
     handlePointStep,
     handleAutoPlay,
+    handleSpeedChange,
     handleResetPointMode,
   } = useTraining();
 
@@ -87,8 +89,10 @@ function App() {
         dataset={dataset}
         isAutoPlaying={isAutoPlaying}
         pointByPointMode={pointByPointMode}
+        playbackSpeed={playbackSpeed}
         onPointStep={handlePointStep}
         onAutoPlay={handleAutoPlay}
+        onSpeedChange={handleSpeedChange}
         onResetMode={handleResetPointMode}
       />
 

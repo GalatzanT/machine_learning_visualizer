@@ -4,8 +4,10 @@ export const PointByPointPanel = ({
   dataset,
   isAutoPlaying,
   pointByPointMode,
+  playbackSpeed,
   onPointStep,
   onAutoPlay,
+  onSpeedChange,
   onResetMode,
 }) => {
   return (
@@ -45,6 +47,28 @@ export const PointByPointPanel = ({
         >
           {TEXT.RESET_MODE}
         </button>
+      </div>
+      <div style={{ marginTop: "10px", display: "flex", gap: "10px", alignItems: "center" }}>
+        <span style={{ fontSize: "14px", color: "#666" }}>Speed:</span>
+        {[1, 5, 100].map(speed => (
+          <button
+            key={speed}
+            onClick={() => onSpeedChange(speed)}
+            disabled={!dataset}
+            style={{
+              padding: "5px 15px",
+              fontSize: "14px",
+              border: playbackSpeed === speed ? "2px solid #007bff" : "1px solid #ccc",
+              background: playbackSpeed === speed ? "#e3f2fd" : "white",
+              color: playbackSpeed === speed ? "#007bff" : "#333",
+              borderRadius: "4px",
+              cursor: dataset ? "pointer" : "not-allowed",
+              fontWeight: playbackSpeed === speed ? "bold" : "normal"
+            }}
+          >
+            x{speed}
+          </button>
+        ))}
       </div>
     </div>
   );

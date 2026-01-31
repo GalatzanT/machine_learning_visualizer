@@ -17,6 +17,7 @@ export const useTraining = () => {
   const [pointByPointMode, setPointByPointMode] = useState(false);
   const [currentPointData, setCurrentPointData] = useState(null);
   const [isAutoPlaying, setIsAutoPlaying] = useState(false);
+  const [playbackSpeed, setPlaybackSpeed] = useState(1);
   const fileInputRef = useRef(null);
   const autoPlayRef = useRef(null);
 
@@ -183,12 +184,6 @@ export const useTraining = () => {
         if (data.explanations) {
           setExplanations(data.explanations);
         }
-
-        setIsAutoPlaying(false);
-        if (autoPlayRef.current) {
-          clearInterval(autoPlayRef.current);
-          autoPlayRef.current = null;
-        }
       }
     } catch (error) {
       alert(
@@ -213,7 +208,17 @@ export const useTraining = () => {
       setIsAutoPlaying(true);
       autoPlayRef.current = setInterval(() => {
         handlePointStep();
-      }, 1000);
+      }, 1000 / playbackSpeed);
+    }
+  };
+
+  const handleSpeedChange = (newSpeed) => {
+    setPlaybackSpeed(newSpeed);
+    if (isAutoPlaying && autoPlayRef.current) {
+      clearInterval(autoPlayRef.current);
+      autoPlayRef.current = setInterval(() => {
+        handlePointStep();
+      }, 1000 / newSpeed);
     }
   };
 
@@ -249,6 +254,7 @@ export const useTraining = () => {
     pointByPointMode,
     currentPointData,
     isAutoPlaying,
+    playbackSpeed,
     fileInputRef,
 
     // Handlers
@@ -261,6 +267,7 @@ export const useTraining = () => {
     handleResetAll,
     handlePointStep,
     handleAutoPlay,
+    handleSpeedChange,
     handleResetPointMode,
   };
 };
