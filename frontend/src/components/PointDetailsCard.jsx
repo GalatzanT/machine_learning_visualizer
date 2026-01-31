@@ -79,7 +79,11 @@ export const PointDetailsCard = ({ currentPointData }) => {
           marginTop: "15px",
         }}
       >
-        <h3>{TEXT.EXPLANATION}</h3>
+        <h3>
+          {currentPointData.is_last_point
+            ? "✨ What Happened in This Epoch"
+            : TEXT.EXPLANATION}
+        </h3>
         <p style={{ fontSize: "14px", margin: 0 }}>
           {currentPointData.explanation}
         </p>

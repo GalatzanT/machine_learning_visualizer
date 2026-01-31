@@ -10,6 +10,7 @@ const getPointColor = (category) => {
 export const ScatterChart = ({
   dataset,
   model,
+  previousModel,
   stepData,
   currentPointData,
 }) => {
@@ -52,8 +53,31 @@ export const ScatterChart = ({
               )
             : 1,
       },
+      ...(previousModel
+        ? [
+            {
+              label: "Previous Epoch",
+              data: [
+                {
+                  x: Math.min(...dataset.x),
+                  y: previousModel.w * Math.min(...dataset.x) + previousModel.b,
+                },
+                {
+                  x: Math.max(...dataset.x),
+                  y: previousModel.w * Math.max(...dataset.x) + previousModel.b,
+                },
+              ],
+              type: "line",
+              borderColor: "rgba(150, 150, 150, 0.5)",
+              borderWidth: 2,
+              borderDash: [5, 5],
+              pointRadius: 0,
+              fill: false,
+            },
+          ]
+        : []),
       {
-        label: TEXT.REGRESSION_LINE,
+        label: "Current Epoch",
         data: [
           {
             x: Math.min(...dataset.x),

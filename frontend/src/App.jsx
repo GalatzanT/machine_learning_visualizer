@@ -36,6 +36,7 @@ function App() {
     dataset,
     learningRate,
     model,
+    previousModel,
     stepData,
     currentEpoch,
     explanations,
@@ -102,9 +103,7 @@ function App() {
               ` | ${TEXT.LOSS}: ${stepData.loss_after.toFixed(4)} | ${TEXT.GRADIENT}: ${stepData.gradient_magnitude.toFixed(4)}`}
           </div>
 
-          {!freezeMode && (
-            <ExplanationPanel explanations={explanations} />
-          )}
+          {!freezeMode && <ExplanationPanel explanations={explanations} />}
 
           {pointByPointMode && (
             <PointDetailsCard currentPointData={currentPointData} />
@@ -123,6 +122,7 @@ function App() {
             <ScatterChart
               dataset={dataset}
               model={model}
+              previousModel={previousModel}
               stepData={stepData}
               currentPointData={currentPointData}
             />

@@ -249,6 +249,7 @@ async def gradient_point_step():
     b_new = None
     error_categories = None
     error_magnitudes_list = None
+    explanations_list = None
     
     if is_last:
         # Update parametri
@@ -260,7 +261,8 @@ async def gradient_point_step():
         state["model"]["b"] = b_new
         state["config"]["current_epoch"] += 1
         
-        # Calculează loss final și categorii de eroare
+        # Calculează predicții ÎNAINTE și DUPĂ pentru explicații
+        y_pred_before = ml_service.calculate_predictions(x, w, b)
         y_pred_all = ml_service.calculate_predictions(x, w_new, b_new)
         loss = ml_service.calculate_mse(y, y_pred_all)
         
@@ -268,6 +270,14 @@ async def gradient_point_step():
         errors, error_magnitudes = ml_service.calculate_errors_per_point(y, y_pred_all)
         error_categories = ml_service.categorize_errors(error_magnitudes)
         error_magnitudes_list = error_magnitudes.tolist()
+        
+        # Generează explicații detaliate (la fel ca în gradient_step)
+        explanations_list = explanation_service.generate_step_explanation(
+            x, y, y_pred_before, w, b,
+            state["point_by_point"]["accumulated_dw"],
+            state["point_by_point"]["accumulated_db"],
+            lr, errors
+        )
         
         state["history"]["loss"].append(float(loss))
         state["history"]["w"].append(float(w_new))
@@ -303,7 +313,9 @@ async def gradient_point_step():
         b_new=float(b_new) if b_new is not None else None,
         explanation=explanation,
         error_categories=error_categories,
-        error_magnitudes=error_magnitudes_list
+        error_magnitudes=error_magnitudes_list,
+        epoch=state["config"]["current_epoch"] if is_last else None,
+        explanations=explanations_list
     )
 
 

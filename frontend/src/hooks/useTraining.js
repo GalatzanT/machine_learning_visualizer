@@ -7,6 +7,7 @@ export const useTraining = () => {
   const [dataset, setDataset] = useState(null);
   const [learningRate, setLearningRate] = useState(0.01);
   const [model, setModel] = useState({ w: 1.0, b: 1.0 });
+  const [previousModel, setPreviousModel] = useState(null);
   const [stepData, setStepData] = useState(null);
   const [currentEpoch, setCurrentEpoch] = useState(0);
   const [explanations, setExplanations] = useState([]);
@@ -28,6 +29,7 @@ export const useTraining = () => {
       const data = await datasetAPI.upload(file);
       setDataset({ x: data.x_values, y: data.y_values });
       setModel({ w: 1.0, b: 1.0 });
+      setPreviousModel(null);
       setStepData(null);
       setCurrentEpoch(0);
       setExplanations([]);
@@ -45,6 +47,7 @@ export const useTraining = () => {
       const data = await datasetAPI.generate(type);
       setDataset({ x: data.x_values, y: data.y_values });
       setModel({ w: 1.0, b: 1.0 });
+      setPreviousModel(null);
       setStepData(null);
       setCurrentEpoch(0);
       setExplanations([]);
@@ -66,6 +69,7 @@ export const useTraining = () => {
 
     try {
       const data = await trainingAPI.gradientStep();
+      setPreviousModel({ ...model });
       setModel({ w: data.w_after, b: data.b_after });
       setStepData(data);
       setCurrentEpoch(data.epoch);
@@ -111,6 +115,7 @@ export const useTraining = () => {
     try {
       await trainingAPI.resetModel();
       setModel({ w: 1.0, b: 1.0 });
+      setPreviousModel(null);
       setStepData(null);
       setCurrentEpoch(0);
       setExplanations([]);
@@ -132,6 +137,7 @@ export const useTraining = () => {
       await trainingAPI.resetAll();
       setDataset(null);
       setModel({ w: 1.0, b: 1.0 });
+      setPreviousModel(null);
       setStepData(null);
       setCurrentEpoch(0);
       setExplanations([]);
@@ -163,13 +169,19 @@ export const useTraining = () => {
       setPointByPointMode(true);
 
       if (data.is_last_point) {
+        setPreviousModel({ ...model });
         setModel({ w: data.w_new, b: data.b_new });
+        setCurrentEpoch(data.epoch || currentEpoch + 1);
 
         if (data.error_categories) {
           setStepData({
             error_categories: data.error_categories,
             error_magnitudes: data.error_magnitudes,
           });
+        }
+
+        if (data.explanations) {
+          setExplanations(data.explanations);
         }
 
         setIsAutoPlaying(false);
@@ -227,6 +239,7 @@ export const useTraining = () => {
     dataset,
     learningRate,
     model,
+    previousModel,
     stepData,
     currentEpoch,
     explanations,

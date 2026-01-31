@@ -50,6 +50,8 @@ class PointStepResponse(BaseModel):
     explanation: str
     error_categories: Optional[List[str]] = None  # Doar la ultimul punct
     error_magnitudes: Optional[List[float]] = None  # Doar la ultimul punct
+    epoch: Optional[int] = None  # Doar la ultimul punct
+    explanations: Optional[List[str]] = None  # Doar la ultimul punct - explicații detaliate
 
 
 class LearningRateConfig(BaseModel):
