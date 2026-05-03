@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "https://tudor-backend.sergiumuresan.ro";
+const API_URL = "http://localhost:8000";
 
 // Dataset API
 export const datasetAPI = {
