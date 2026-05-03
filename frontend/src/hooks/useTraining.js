@@ -18,6 +18,13 @@ export const useTraining = () => {
   const [currentPointData, setCurrentPointData] = useState(null);
   const [isAutoPlaying, setIsAutoPlaying] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
+  const [currentModelParameters, setCurrentModelParameters] = useState({ w: 1, b: 1 });
+  const [lossHistory, setLossHistory] = useState([]);
+  const [currentMetrics, setCurrentMetrics] = useState({
+    final_loss: 0,
+    current_epoch: 0,
+    samples: 0,
+  });
   const fileInputRef = useRef(null);
   const autoPlayRef = useRef(null);
 
@@ -35,6 +42,13 @@ export const useTraining = () => {
       setCurrentEpoch(0);
       setExplanations([]);
       setFreezeMode(false);
+      setCurrentModelParameters({ w: 1, b: 1 });
+      setLossHistory([]);
+      setCurrentMetrics({
+        final_loss: 0,
+        current_epoch: 0,
+        samples: data.num_points,
+      });
       alert(`✅ ${TEXT.DATASET_LOADED}: ${data.num_points} ${TEXT.POINTS}`);
     } catch (error) {
       alert(
@@ -53,6 +67,13 @@ export const useTraining = () => {
       setCurrentEpoch(0);
       setExplanations([]);
       setFreezeMode(false);
+      setCurrentModelParameters({ w: 1, b: 1 });
+      setLossHistory([]);
+      setCurrentMetrics({
+        final_loss: 0,
+        current_epoch: 0,
+        samples: data.num_points,
+      });
       if (fileInputRef.current) fileInputRef.current.value = "";
     } catch (error) {
       alert(
@@ -76,6 +97,24 @@ export const useTraining = () => {
       setCurrentEpoch(data.epoch);
       setExplanations(data.explanations);
       setFreezeMode(false);
+
+      // Capture model parameters from step response
+      setCurrentModelParameters({
+        w: data.w_after,
+        b: data.b_after,
+      });
+
+      // Add loss to history
+      setLossHistory(prev => [...prev, data.loss_after || 0]);
+
+      // If end of epoch, update metrics
+      if (data.is_last_point) {
+        setCurrentMetrics({
+          final_loss: data.loss_after || 0,
+          current_epoch: data.epoch,
+          samples: dataset.x.length,
+        });
+      }
     } catch (error) {
       alert(
         `${TEXT.ERROR_MESSAGE}: ${error.response?.data?.detail || error.message}`,
@@ -125,6 +164,13 @@ export const useTraining = () => {
       setPointByPointMode(false);
       setCurrentPointData(null);
       setIsAutoPlaying(false);
+      setCurrentModelParameters({ w: 1, b: 1 });
+      setLossHistory([]);
+      setCurrentMetrics({
+        final_loss: 0,
+        current_epoch: 0,
+        samples: dataset?.x.length || 0,
+      });
       if (autoPlayRef.current) clearInterval(autoPlayRef.current);
     } catch (error) {
       alert(
@@ -148,6 +194,13 @@ export const useTraining = () => {
       setPointByPointMode(false);
       setCurrentPointData(null);
       setIsAutoPlaying(false);
+      setCurrentModelParameters({ w: 1, b: 1 });
+      setLossHistory([]);
+      setCurrentMetrics({
+        final_loss: 0,
+        current_epoch: 0,
+        samples: 0,
+      });
       if (autoPlayRef.current) clearInterval(autoPlayRef.current);
       if (fileInputRef.current) fileInputRef.current.value = "";
     } catch (error) {
@@ -255,6 +308,9 @@ export const useTraining = () => {
     currentPointData,
     isAutoPlaying,
     playbackSpeed,
+    currentModelParameters,
+    lossHistory,
+    currentMetrics,
     fileInputRef,
 
     // Handlers

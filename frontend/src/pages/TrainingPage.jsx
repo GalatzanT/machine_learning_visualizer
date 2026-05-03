@@ -55,6 +55,9 @@ export function TrainingPage() {
     currentPointData,
     isAutoPlaying,
     playbackSpeed,
+    currentModelParameters,
+    lossHistory,
+    currentMetrics,
     fileInputRef,
     handleFileUpload,
     handleGenerateDataset,
@@ -88,11 +91,15 @@ export function TrainingPage() {
         algorithm_type: "Linear Regression",
         dataset: formattedDataset,
         hyperparameters: { learning_rate: learningRate },
-        model_parameters: { w: model.w, b: model.b },
-        loss_history: stepData ? [stepData.loss_after] : [],
+        model_parameters: {
+          w: currentModelParameters.w,
+          b: currentModelParameters.b,
+        },
+        loss_history: lossHistory,
         metrics: {
-          final_loss: stepData?.loss_after || 0,
-          current_epoch: currentEpoch,
+          final_loss: lossHistory.length > 0 ? lossHistory[lossHistory.length - 1] : 0,
+          current_epoch: currentMetrics.current_epoch,
+          samples: currentMetrics.samples,  
         },
       };
 

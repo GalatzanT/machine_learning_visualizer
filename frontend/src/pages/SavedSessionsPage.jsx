@@ -78,6 +78,130 @@ export function SavedSessionsPage({ setCurrentPage }) {
     }
   };
 
+  const downloadModel = (session) => {
+    try {
+      // Generate JSON based on algorithm
+      let modelJSON;
+
+      if (session.algorithm_type === "Linear Regression") {
+        modelJSON = {
+          algorithm: "linear_regression",
+          created_at: session.created_at,
+          training_samples: session.metrics?.samples || 0,
+          final_loss: session.metrics?.final_loss || 0,
+
+          parameters: {
+            w: session.model_parameters?.w || 0,
+            b: session.model_parameters?.b || 0,
+          },
+
+          formula: "y = w*x + b",
+
+          how_to_use: {
+            step1: "Extract w and b from parameters",
+            step2: "For new prediction: y = w*x + b",
+            example: `y = ${session.model_parameters?.w || 0}*x + ${session.model_parameters?.b || 0}`,
+          },
+        };
+      } else if (session.algorithm_type === "logistic_regression") {
+        modelJSON = {
+          algorithm: "logistic_regression",
+          created_at: session.created_at,
+          training_samples: session.metrics?.samples || 0,
+          final_loss: session.metrics?.final_loss || 0,
+
+          parameters: {
+            w: session.model_parameters?.w || 0,
+            b: session.model_parameters?.b || 0,
+          },
+
+          formula: "sigmoid(w*x + b)",
+
+          how_to_use: {
+            step1: "Extract w and b from parameters",
+            step2: "For new prediction: sigmoid(w*x + b)",
+            note: "sigmoid(z) = 1 / (1 + e^(-z))",
+          },
+        };
+      } else if (session.algorithm_type === "knn") {
+        modelJSON = {
+          algorithm: "knn",
+          created_at: session.created_at,
+          k: session.model_parameters?.k || 5,
+          training_samples: session.metrics?.samples || 0,
+
+          how_to_use: {
+            step1: "KNN requires original training data",
+            step2: "For new prediction: find k nearest neighbors",
+            step3: "Use majority vote (classification) or average (regression)",
+            note: "This file alone cannot make predictions - need original dataset",
+          },
+        };
+      } else if (session.algorithm_type === "svm") {
+        modelJSON = {
+          algorithm: "svm",
+          created_at: session.created_at,
+          training_samples: session.metrics?.samples || 0,
+          final_loss: session.metrics?.final_loss || 0,
+
+          parameters: session.model_parameters || {},
+
+          how_to_use: {
+            note: "SVM model parameters stored. Implementation requires vector operations.",
+          },
+        };
+      } else if (session.algorithm_type === "decision_tree") {
+        modelJSON = {
+          algorithm: "decision_tree",
+          created_at: session.created_at,
+          training_samples: session.metrics?.samples || 0,
+
+          tree_structure: session.model_parameters?.tree || {},
+
+          how_to_use: {
+            step1:
+              "Tree structure contains nodes with feature, threshold, predictions",
+            step2: "For new prediction: traverse tree following feature values",
+            step3: "Reach leaf node for final prediction",
+          },
+        };
+      } else {
+        modelJSON = {
+          algorithm: session.algorithm_type,
+          created_at: session.created_at,
+          parameters: session.model_parameters || {},
+          error: "Unknown algorithm type",
+        };
+      }
+
+      // Create filename with timestamp
+      const date = new Date();
+      const dateStr = date.toISOString().split("T")[0]; // YYYY-MM-DD
+      const timeStr =
+        date.getHours().toString().padStart(2, "0") +
+        date.getMinutes().toString().padStart(2, "0") +
+        date.getSeconds().toString().padStart(2, "0"); // HHMMSS
+
+      const filename = `${session.algorithm_type.replace(" ", "_")}_${dateStr}_${timeStr}.json`;
+
+      // Create blob and download
+      const blob = new Blob([JSON.stringify(modelJSON, null, 2)], {
+        type: "application/json",
+      });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Download failed:", err);
+      alert("Failed to download model");
+    }
+  };
+
   return (
     <div style={styles.pageContainer}>
       <h1 style={styles.pageTitle}>Your Training Sessions</h1>
@@ -127,6 +251,12 @@ export function SavedSessionsPage({ setCurrentPage }) {
                   style={styles.viewButton}
                 >
                   View
+                </button>
+                <button
+                  onClick={() => downloadModel(session)}
+                  style={styles.downloadButton}
+                >
+                  Download
                 </button>
                 <button
                   onClick={() => handleDeleteSession(session.id)}
@@ -232,6 +362,18 @@ const styles = {
     flex: 1,
     padding: "8px 16px",
     background: "#0066CC",
+    color: "#FFFFFF",
+    border: "none",
+    borderRadius: "8px",
+    fontSize: "14px",
+    fontWeight: "500",
+    cursor: "pointer",
+    transition: "all 0.2s ease",
+  },
+  downloadButton: {
+    flex: 1,
+    padding: "8px 16px",
+    background: "#00A8E8",
     color: "#FFFFFF",
     border: "none",
     borderRadius: "8px",

@@ -160,6 +160,9 @@ class TrainingSessionCreate(BaseModel):
     algorithm_type: str  # linear_regression, logistic_regression, knn, svm, decision_tree
     dataset: List[dict]  # List of {x: float, y: float}
     hyperparameters: dict  # {learning_rate: 0.01, epochs: 50, k: 5, etc.}
+    model_parameters: Optional[dict] = None
+    loss_history: Optional[List[float]] = None
+    metrics: Optional[dict] = None
     
     class Config:
         json_schema_extra = {
