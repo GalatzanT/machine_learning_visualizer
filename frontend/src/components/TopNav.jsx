@@ -25,7 +25,9 @@ export function TopNav({ setCurrentPage, currentPage }) {
               onClick={() => setCurrentPage("saved-sessions")}
               style={{
                 ...styles.navLink,
-                ...(currentPage === "saved-sessions" ? styles.navLinkActive : {}),
+                ...(currentPage === "saved-sessions"
+                  ? styles.navLinkActive
+                  : {}),
               }}
             >
               Saved Sessions

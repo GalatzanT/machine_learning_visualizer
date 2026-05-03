@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
-import { useAuth } from '../hooks/useAuth';
+import { useState, useEffect } from "react";
+import { useAuth } from "../hooks/useAuth";
 
 export function SavedSessionsPage({ setCurrentPage }) {
   const auth = useAuth();
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (auth.token) {
@@ -15,18 +15,21 @@ export function SavedSessionsPage({ setCurrentPage }) {
 
   const fetchSessions = async () => {
     setLoading(true);
-    setError('');
+    setError("");
 
     try {
-      const response = await fetch('http://localhost:8000/api/training-sessions', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${auth.token}`,
+      const response = await fetch(
+        "http://localhost:8000/api/training-sessions",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${auth.token}`,
+          },
         },
-      });
+      );
 
       if (!response.ok) {
-        throw new Error('Failed to fetch sessions');
+        throw new Error("Failed to fetch sessions");
       }
 
       const data = await response.json();
@@ -40,17 +43,17 @@ export function SavedSessionsPage({ setCurrentPage }) {
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
   const handleDeleteSession = async (sessionId) => {
-    if (!window.confirm('Are you sure you want to delete this session?')) {
+    if (!window.confirm("Are you sure you want to delete this session?")) {
       return;
     }
 
@@ -58,15 +61,15 @@ export function SavedSessionsPage({ setCurrentPage }) {
       const response = await fetch(
         `http://localhost:8000/api/training-sessions/${sessionId}`,
         {
-          method: 'DELETE',
+          method: "DELETE",
           headers: {
-            'Authorization': `Bearer ${auth.token}`,
+            Authorization: `Bearer ${auth.token}`,
           },
-        }
+        },
       );
 
       if (!response.ok) {
-        throw new Error('Failed to delete session');
+        throw new Error("Failed to delete session");
       }
 
       setSessions(sessions.filter((s) => s.id !== sessionId));
@@ -120,7 +123,7 @@ export function SavedSessionsPage({ setCurrentPage }) {
 
               <div style={styles.cardFooter}>
                 <button
-                  onClick={() => setCurrentPage('training')}
+                  onClick={() => setCurrentPage("training")}
                   style={styles.viewButton}
                 >
                   View
@@ -142,111 +145,111 @@ export function SavedSessionsPage({ setCurrentPage }) {
 
 const styles = {
   pageContainer: {
-    maxWidth: '1200px',
-    margin: '0 auto',
-    padding: '40px 20px',
-    background: '#F8FAFC',
-    minHeight: '100vh',
+    maxWidth: "1200px",
+    margin: "0 auto",
+    padding: "40px 20px",
+    background: "#F8FAFC",
+    minHeight: "100vh",
   },
   pageTitle: {
-    fontSize: '32px',
-    fontWeight: 'bold',
-    color: '#1a202c',
-    marginBottom: '40px',
-    textAlign: 'center',
+    fontSize: "32px",
+    fontWeight: "bold",
+    color: "#1a202c",
+    marginBottom: "40px",
+    textAlign: "center",
   },
   errorMessage: {
-    color: '#FF6B6B',
-    fontSize: '14px',
-    padding: '12px 16px',
-    background: '#FFF5F5',
-    borderRadius: '8px',
-    border: '1px solid #FFE0E0',
-    marginBottom: '20px',
+    color: "#FF6B6B",
+    fontSize: "14px",
+    padding: "12px 16px",
+    background: "#FFF5F5",
+    borderRadius: "8px",
+    border: "1px solid #FFE0E0",
+    marginBottom: "20px",
   },
   loadingMessage: {
-    textAlign: 'center',
-    color: '#4a5568',
-    fontSize: '16px',
-    padding: '40px',
+    textAlign: "center",
+    color: "#4a5568",
+    fontSize: "16px",
+    padding: "40px",
   },
   emptyState: {
-    textAlign: 'center',
-    color: '#4a5568',
-    fontSize: '16px',
-    padding: '80px 20px',
-    background: '#FFFFFF',
-    borderRadius: '12px',
-    border: '1px solid #e2e8f0',
+    textAlign: "center",
+    color: "#4a5568",
+    fontSize: "16px",
+    padding: "80px 20px",
+    background: "#FFFFFF",
+    borderRadius: "12px",
+    border: "1px solid #e2e8f0",
   },
   sessionGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-    gap: '24px',
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
+    gap: "24px",
   },
   sessionCard: {
-    background: '#FFFFFF',
-    border: '1px solid #e2e8f0',
-    borderRadius: '12px',
-    padding: '20px',
-    transition: 'all 0.2s ease',
-    cursor: 'pointer',
+    background: "#FFFFFF",
+    border: "1px solid #e2e8f0",
+    borderRadius: "12px",
+    padding: "20px",
+    transition: "all 0.2s ease",
+    cursor: "pointer",
   },
   cardHeader: {
-    marginBottom: '16px',
-    paddingBottom: '12px',
-    borderBottom: '1px solid #e2e8f0',
+    marginBottom: "16px",
+    paddingBottom: "12px",
+    borderBottom: "1px solid #e2e8f0",
   },
   cardTitle: {
-    fontSize: '18px',
-    fontWeight: '600',
-    color: '#0066CC',
-    margin: '0',
+    fontSize: "18px",
+    fontWeight: "600",
+    color: "#0066CC",
+    margin: "0",
   },
   cardContent: {
-    marginBottom: '16px',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '12px',
+    marginBottom: "16px",
+    display: "flex",
+    flexDirection: "column",
+    gap: "12px",
   },
   cardRow: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    fontSize: '14px',
-    color: '#1a202c',
+    display: "flex",
+    justifyContent: "space-between",
+    fontSize: "14px",
+    color: "#1a202c",
   },
   label: {
-    fontWeight: '500',
-    color: '#4a5568',
+    fontWeight: "500",
+    color: "#4a5568",
   },
   cardFooter: {
-    display: 'flex',
-    gap: '12px',
-    paddingTop: '12px',
-    borderTop: '1px solid #e2e8f0',
+    display: "flex",
+    gap: "12px",
+    paddingTop: "12px",
+    borderTop: "1px solid #e2e8f0",
   },
   viewButton: {
     flex: 1,
-    padding: '8px 16px',
-    background: '#0066CC',
-    color: '#FFFFFF',
-    border: 'none',
-    borderRadius: '8px',
-    fontSize: '14px',
-    fontWeight: '500',
-    cursor: 'pointer',
-    transition: 'all 0.2s ease',
+    padding: "8px 16px",
+    background: "#0066CC",
+    color: "#FFFFFF",
+    border: "none",
+    borderRadius: "8px",
+    fontSize: "14px",
+    fontWeight: "500",
+    cursor: "pointer",
+    transition: "all 0.2s ease",
   },
   deleteButton: {
     flex: 1,
-    padding: '8px 16px',
-    background: '#FFFFFF',
-    color: '#FF6B6B',
-    border: '1px solid #FF6B6B',
-    borderRadius: '8px',
-    fontSize: '14px',
-    fontWeight: '500',
-    cursor: 'pointer',
-    transition: 'all 0.2s ease',
+    padding: "8px 16px",
+    background: "#FFFFFF",
+    color: "#FF6B6B",
+    border: "1px solid #FF6B6B",
+    borderRadius: "8px",
+    fontSize: "14px",
+    fontWeight: "500",
+    cursor: "pointer",
+    transition: "all 0.2s ease",
   },
 };

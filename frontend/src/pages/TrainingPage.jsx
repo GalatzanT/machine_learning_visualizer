@@ -96,14 +96,17 @@ export function TrainingPage() {
         },
       };
 
-      const response = await fetch("http://localhost:8000/api/training-sessions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${auth.token}`,
+      const response = await fetch(
+        "http://localhost:8000/api/training-sessions",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${auth.token}`,
+          },
+          body: JSON.stringify(sessionData),
         },
-        body: JSON.stringify(sessionData),
-      });
+      );
 
       if (!response.ok) {
         throw new Error("Failed to save session");
@@ -214,16 +217,14 @@ export function TrainingPage() {
       )}
 
       {showSaveDialog && (
-        <div style={styles.modalOverlay} onClick={() => setShowSaveDialog(false)}>
-          <div
-            style={styles.modalContent}
-            onClick={(e) => e.stopPropagation()}
-          >
+        <div
+          style={styles.modalOverlay}
+          onClick={() => setShowSaveDialog(false)}
+        >
+          <div style={styles.modalContent} onClick={(e) => e.stopPropagation()}>
             <h3 style={styles.modalTitle}>Save Training Session</h3>
 
-            {saveError && (
-              <div style={styles.errorMessage}>{saveError}</div>
-            )}
+            {saveError && <div style={styles.errorMessage}>{saveError}</div>}
 
             <div style={styles.formGroup}>
               <label style={styles.label}>Session Name (Optional)</label>
@@ -360,4 +361,3 @@ const styles = {
     transition: "all 0.2s ease",
   },
 };
-
