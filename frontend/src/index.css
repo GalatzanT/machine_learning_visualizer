@@ -58,7 +58,7 @@ h1 {
   top: 0;
   left: 0;
   right: 0;
-  height: 64px;
+  height: 80px;
   background: #FFFFFF;
   border-bottom: 1px solid #e2e8f0;
   padding: 0 48px;
@@ -66,25 +66,33 @@ h1 {
   justify-content: space-between;
   align-items: center;
   z-index: 10;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .topnav-logo {
-  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
   color: #0066CC;
-  font-size: 16px;
+  font-size: 18px;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .topnav-center {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+  display: flex;
+  gap: 32px;
+  align-items: center;
   color: #1a202c;
-  font-size: 14px;
+  font-size: 15px;
+  flex-shrink: 0;
 }
 
 .topnav-right {
-  flex: 1;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
 }
 
 .control-group {

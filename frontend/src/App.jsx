@@ -29,7 +29,7 @@ function App() {
     return (
       <AuthProvider>
         <TopNav setCurrentPage={setCurrentPage} currentPage={currentPage} />
-        <main style={{ paddingTop: "64px" }}>
+        <main style={{ paddingTop: "80px" }}>
           <SavedSessionsPage setCurrentPage={setCurrentPage} />
         </main>
       </AuthProvider>
@@ -39,7 +39,7 @@ function App() {
   return (
     <AuthProvider>
       <TopNav setCurrentPage={setCurrentPage} currentPage={currentPage} />
-      <main style={{ paddingTop: "64px" }}>
+      <main style={{ paddingTop: "80px" }}>
         <TrainingPage />
       </main>
     </AuthProvider>

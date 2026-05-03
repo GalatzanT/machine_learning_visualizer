@@ -19,20 +19,17 @@ export function TopNav({ setCurrentPage, currentPage }) {
           Training
         </span>
         {auth.token && (
-          <>
-            <span style={styles.separator}>|</span>
-            <span
-              onClick={() => setCurrentPage("saved-sessions")}
-              style={{
-                ...styles.navLink,
-                ...(currentPage === "saved-sessions"
-                  ? styles.navLinkActive
-                  : {}),
-              }}
-            >
-              Saved Sessions
-            </span>
-          </>
+          <span
+            onClick={() => setCurrentPage("saved-sessions")}
+            style={{
+              ...styles.navLink,
+              ...(currentPage === "saved-sessions"
+                ? styles.navLinkActive
+                : {}),
+            }}
+          >
+            Saved Sessions
+          </span>
         )}
       </div>
       <div className="topnav-right">
@@ -75,18 +72,17 @@ export function TopNav({ setCurrentPage, currentPage }) {
 const styles = {
   navLink: {
     cursor: "pointer",
-    color: "#4a5568",
-    fontSize: "14px",
-    padding: "0 8px",
-    transition: "all 0.2s ease",
+    color: "#1a202c",
+    fontSize: "15px",
+    fontWeight: "500",
+    padding: "0 0",
+    paddingBottom: "0px",
+    transition: "color 0.2s ease",
   },
   navLinkActive: {
     color: "#0066CC",
-    fontWeight: "600",
-  },
-  separator: {
-    color: "#e2e8f0",
-    margin: "0 8px",
+    borderBottom: "3px solid #0066CC",
+    paddingBottom: "2px",
   },
   authContainer: {
     display: "flex",
@@ -96,14 +92,15 @@ const styles = {
   welcomeText: {
     fontSize: "14px",
     color: "#4a5568",
+    fontWeight: "400",
   },
   logoutButton: {
     background: "#FFFFFF",
     color: "#FF6B6B",
     border: "1px solid #FF6B6B",
-    padding: "8px 24px",
+    padding: "10px 24px",
     borderRadius: "8px",
-    fontWeight: "500",
+    fontWeight: "600",
     cursor: "pointer",
     fontSize: "14px",
     transition: "all 0.2s ease",
@@ -111,14 +108,15 @@ const styles = {
   buttonsContainer: {
     display: "flex",
     gap: "12px",
+    alignItems: "center",
   },
   signInButton: {
     background: "#FFFFFF",
     color: "#0066CC",
     border: "1px solid #0066CC",
-    padding: "8px 24px",
+    padding: "10px 24px",
     borderRadius: "8px",
-    fontWeight: "500",
+    fontWeight: "600",
     cursor: "pointer",
     fontSize: "14px",
     transition: "all 0.2s ease",
@@ -127,9 +125,9 @@ const styles = {
     background: "#0066CC",
     color: "#FFFFFF",
     border: "none",
-    padding: "8px 24px",
+    padding: "10px 24px",
     borderRadius: "8px",
-    fontWeight: "500",
+    fontWeight: "600",
     cursor: "pointer",
     fontSize: "14px",
     transition: "all 0.2s ease",
