@@ -6,6 +6,10 @@ export function SavedSessionsPage({ setCurrentPage }) {
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [predictSession, setPredictSession] = useState(null);
+  const [predictInput, setPredictInput] = useState('');
+  const [predictResult, setPredictResult] = useState(null);
+  const [predictError, setPredictError] = useState('');
 
   useEffect(() => {
     if (auth.token) {
@@ -75,6 +79,48 @@ export function SavedSessionsPage({ setCurrentPage }) {
       setSessions(sessions.filter((s) => s.id !== sessionId));
     } catch (err) {
       setError(err.message);
+    }
+  };
+
+  const handlePredict = () => {
+    if (!predictSession) return;
+    
+    setPredictError('');
+    setPredictResult(null);
+    
+    try {
+      const xValue = parseFloat(predictInput);
+      if (isNaN(xValue)) {
+        setPredictError('Please enter a valid number');
+        return;
+      }
+      
+      const algorithm = predictSession.algorithm_type.toLowerCase();
+      let result;
+      
+      if (algorithm.includes('linear')) {
+        const w = predictSession.model_parameters?.w || 0;
+        const b = predictSession.model_parameters?.b || 0;
+        result = w * xValue + b;
+      } 
+      else if (algorithm.includes('logistic')) {
+        const w = predictSession.model_parameters?.w || 0;
+        const b = predictSession.model_parameters?.b || 0;
+        const z = w * xValue + b;
+        result = 1 / (1 + Math.exp(-z));
+      }
+      else {
+        setPredictError('Prediction not supported for this algorithm');
+        return;
+      }
+      
+      setPredictResult({
+        x: xValue,
+        y: result
+      });
+      
+    } catch (err) {
+      setPredictError('Error calculating prediction');
     }
   };
 
@@ -247,10 +293,15 @@ export function SavedSessionsPage({ setCurrentPage }) {
 
               <div style={styles.cardFooter}>
                 <button
-                  onClick={() => setCurrentPage("training")}
+                  onClick={() => {
+                    setPredictSession(session);
+                    setPredictInput('');
+                    setPredictResult(null);
+                    setPredictError('');
+                  }}
                   style={styles.viewButton}
                 >
-                  View
+                  Predict
                 </button>
                 <button
                   onClick={() => downloadModel(session)}
@@ -267,6 +318,92 @@ export function SavedSessionsPage({ setCurrentPage }) {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {predictSession && (
+        <div style={predictModalStyles.overlay} onClick={() => setPredictSession(null)}>
+          <div style={predictModalStyles.content} onClick={(e) => e.stopPropagation()}>
+            
+            <h3 style={predictModalStyles.title}>Model Prediction</h3>
+            
+            {/* Model Info Section */}
+            <div style={predictModalStyles.section}>
+              <h4 style={predictModalStyles.sectionTitle}>Model Information</h4>
+              <div style={predictModalStyles.infoRow}>
+                <span>Algorithm:</span>
+                <span style={predictModalStyles.infoValue}>{predictSession.algorithm_type}</span>
+              </div>
+              <div style={predictModalStyles.infoRow}>
+                <span>Training Loss:</span>
+                <span style={predictModalStyles.infoValue}>{(predictSession.metrics?.final_loss || 0).toFixed(6)}</span>
+              </div>
+              {predictSession.model_parameters && (
+                <>
+                  <div style={predictModalStyles.infoRow}>
+                    <span>Weight (w):</span>
+                    <span style={predictModalStyles.infoValue}>{predictSession.model_parameters.w?.toFixed(10)}</span>
+                  </div>
+                  <div style={predictModalStyles.infoRow}>
+                    <span>Bias (b):</span>
+                    <span style={predictModalStyles.infoValue}>{predictSession.model_parameters.b?.toFixed(10)}</span>
+                  </div>
+                  <div style={predictModalStyles.infoRow}>
+                    <span>Formula:</span>
+                    <span style={predictModalStyles.formula}>y = {predictSession.model_parameters.w?.toFixed(4)}·x + {predictSession.model_parameters.b?.toFixed(4)}</span>
+                  </div>
+                </>
+              )}
+            </div>
+            
+            {/* Prediction Input Section */}
+            <div style={predictModalStyles.section}>
+              <h4 style={predictModalStyles.sectionTitle}>Make Prediction</h4>
+              <div style={predictModalStyles.inputGroup}>
+                <label style={predictModalStyles.label}>Enter X value:</label>
+                <input
+                  type="number"
+                  value={predictInput}
+                  onChange={(e) => setPredictInput(e.target.value)}
+                  placeholder="e.g., 5.5"
+                  style={predictModalStyles.input}
+                />
+              </div>
+              
+              {predictError && (
+                <div style={predictModalStyles.error}>{predictError}</div>
+              )}
+              
+              {predictResult && (
+                <div style={predictModalStyles.result}>
+                  <div style={predictModalStyles.resultRow}>
+                    <span>Input X:</span>
+                    <span style={predictModalStyles.resultValue}>{predictResult.x}</span>
+                  </div>
+                  <div style={predictModalStyles.resultRow}>
+                    <span>Predicted Y:</span>
+                    <span style={predictModalStyles.resultValue}>{predictResult.y.toFixed(6)}</span>
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            {/* Modal Footer */}
+            <div style={predictModalStyles.footer}>
+              <button
+                onClick={() => setPredictSession(null)}
+                style={predictModalStyles.closeButton}
+              >
+                Close
+              </button>
+              <button
+                onClick={handlePredict}
+                style={predictModalStyles.predictButton}
+              >
+                Predict
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
@@ -393,5 +530,141 @@ const styles = {
     fontWeight: "500",
     cursor: "pointer",
     transition: "all 0.2s ease",
+  },
+};
+
+const predictModalStyles = {
+  overlay: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background: 'rgba(0, 0, 0, 0.5)',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1000,
+  },
+  content: {
+    background: '#FFFFFF',
+    borderRadius: '12px',
+    padding: '32px',
+    maxWidth: '500px',
+    width: '90%',
+    maxHeight: '80vh',
+    overflowY: 'auto',
+    boxShadow: '0 10px 40px rgba(0, 0, 0, 0.2)',
+  },
+  title: {
+    fontSize: '20px',
+    fontWeight: 'bold',
+    color: '#1a202c',
+    marginBottom: '24px',
+  },
+  section: {
+    marginBottom: '24px',
+  },
+  sectionTitle: {
+    fontSize: '14px',
+    fontWeight: '600',
+    color: '#0066CC',
+    marginBottom: '12px',
+    textTransform: 'uppercase',
+    letterSpacing: '0.5px',
+  },
+  infoRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    padding: '8px 0',
+    fontSize: '14px',
+    color: '#4a5568',
+  },
+  infoValue: {
+    fontFamily: 'monospace',
+    fontWeight: '600',
+    color: '#1a202c',
+  },
+  formula: {
+    fontFamily: 'monospace',
+    fontWeight: '600',
+    color: '#0066CC',
+  },
+  inputGroup: {
+    marginBottom: '16px',
+  },
+  label: {
+    display: 'block',
+    color: '#1a202c',
+    fontWeight: '600',
+    fontSize: '14px',
+    marginBottom: '8px',
+  },
+  input: {
+    width: '100%',
+    padding: '12px 16px',
+    border: '1px solid #e2e8f0',
+    borderRadius: '8px',
+    fontSize: '14px',
+    fontFamily: 'inherit',
+    boxSizing: 'border-box',
+  },
+  error: {
+    color: '#FF6B6B',
+    fontSize: '14px',
+    padding: '12px',
+    marginBottom: '16px',
+    background: '#FFF5F5',
+    borderRadius: '8px',
+    border: '1px solid #FFE0E0',
+  },
+  result: {
+    padding: '16px',
+    background: '#F0F9FF',
+    borderRadius: '8px',
+    border: '1px solid #E0F2FE',
+    marginBottom: '16px',
+  },
+  resultRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    padding: '8px 0',
+    fontSize: '14px',
+  },
+  resultValue: {
+    fontFamily: 'monospace',
+    fontWeight: '600',
+    color: '#0066CC',
+    fontSize: '16px',
+  },
+  footer: {
+    display: 'flex',
+    gap: '12px',
+    justifyContent: 'flex-end',
+    marginTop: '24px',
+    paddingTop: '24px',
+    borderTop: '1px solid #e2e8f0',
+  },
+  closeButton: {
+    padding: '10px 24px',
+    background: '#FFFFFF',
+    color: '#4a5568',
+    border: '1px solid #e2e8f0',
+    borderRadius: '8px',
+    fontSize: '14px',
+    fontWeight: '600',
+    cursor: 'pointer',
+    transition: 'all 0.2s ease',
+  },
+  predictButton: {
+    padding: '10px 24px',
+    background: '#0066CC',
+    color: '#FFFFFF',
+    border: 'none',
+    borderRadius: '8px',
+    fontSize: '14px',
+    fontWeight: '600',
+    cursor: 'pointer',
+    transition: 'all 0.2s ease',
   },
 };
