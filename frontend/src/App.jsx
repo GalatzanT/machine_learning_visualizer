@@ -4,6 +4,7 @@ import { TopNav } from "./components/TopNav";
 import { TrainingPage } from "./pages/TrainingPage";
 import { LoginPage } from "./pages/LoginPage";
 import { RegisterPage } from "./pages/RegisterPage";
+import { SavedSessionsPage } from "./pages/SavedSessionsPage";
 
 function App() {
   const [currentPage, setCurrentPage] = useState("training");
@@ -24,9 +25,20 @@ function App() {
     );
   }
 
+  if (currentPage === "saved-sessions") {
+    return (
+      <AuthProvider>
+        <TopNav setCurrentPage={setCurrentPage} currentPage={currentPage} />
+        <main style={{ paddingTop: "64px" }}>
+          <SavedSessionsPage setCurrentPage={setCurrentPage} />
+        </main>
+      </AuthProvider>
+    );
+  }
+
   return (
     <AuthProvider>
-      <TopNav setCurrentPage={setCurrentPage} />
+      <TopNav setCurrentPage={setCurrentPage} currentPage={currentPage} />
       <main style={{ paddingTop: "64px" }}>
         <TrainingPage />
       </main>

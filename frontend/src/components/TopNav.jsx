@@ -1,6 +1,6 @@
 import { useAuth } from "../hooks/useAuth";
 
-export function TopNav({ setCurrentPage }) {
+export function TopNav({ setCurrentPage, currentPage }) {
   const auth = useAuth();
 
   return (
@@ -9,7 +9,29 @@ export function TopNav({ setCurrentPage }) {
         <span>🎓 ML Training Visualizer</span>
       </div>
       <div className="topnav-center">
-        <span>Training</span>
+        <span
+          onClick={() => setCurrentPage("training")}
+          style={{
+            ...styles.navLink,
+            ...(currentPage === "training" ? styles.navLinkActive : {}),
+          }}
+        >
+          Training
+        </span>
+        {auth.token && (
+          <>
+            <span style={styles.separator}>|</span>
+            <span
+              onClick={() => setCurrentPage("saved-sessions")}
+              style={{
+                ...styles.navLink,
+                ...(currentPage === "saved-sessions" ? styles.navLinkActive : {}),
+              }}
+            >
+              Saved Sessions
+            </span>
+          </>
+        )}
       </div>
       <div className="topnav-right">
         {auth.token ? (
@@ -49,6 +71,21 @@ export function TopNav({ setCurrentPage }) {
 }
 
 const styles = {
+  navLink: {
+    cursor: "pointer",
+    color: "#4a5568",
+    fontSize: "14px",
+    padding: "0 8px",
+    transition: "all 0.2s ease",
+  },
+  navLinkActive: {
+    color: "#0066CC",
+    fontWeight: "600",
+  },
+  separator: {
+    color: "#e2e8f0",
+    margin: "0 8px",
+  },
   authContainer: {
     display: "flex",
     alignItems: "center",
