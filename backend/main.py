@@ -1,58 +1,116 @@
 """
-Main entry point - versiune simplificată și organizată
+Main entry point for ML Education API
+
+FastAPI application for machine learning education system with:
+    - User authentication and JWT tokens
+    - Training session management
+    - Dataset handling
 """
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from database import init_db
+from app.routers import auth, training_sessions
 from app.api import training, dataset
 
-# Creează aplicația FastAPI
+# Initialize database
+init_db()
+
+# Create FastAPI application
 app = FastAPI(
-    title="ML Explicative System API",
-    description="Backend pentru sistemul explicativ de învățare automată - Lucrare de licență UBB FMI",
-    version="1.0.0"
+    title="ML Education API",
+    description="Backend for ML education system - Licență UBB FMI",
+    version="2.0.0"
 )
 
-# CORS pentru frontend
+# CORS middleware for frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:3001", "http://localhost:5173"],
+    allow_origins=[
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "http://localhost:5173",
+        "http://localhost:8000"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Înregistrează routerele
+# Include routers
+# Authentication routes (no prefix)
+app.include_router(auth.router, tags=["authentication"])
+
+# Training sessions routes (with /api prefix)
+app.include_router(training_sessions.router)
+
+# Legacy routes for dataset and training
 app.include_router(training.router)
 app.include_router(dataset.router)
 
-
 @app.get("/")
-async def root():
-    """Health check"""
+async def root() -> dict:
+    """
+    Health check and API information endpoint.
+    
+    Returns:
+        Basic API information and available endpoints
+    """
     return {
         "status": "online",
-        "message": "ML Explicative System API",
-        "version": "1.0.0",
+        "message": "ML Education API",
+        "version": "2.0.0",
         "endpoints": {
-            "training": "/api/gradient/step, /api/state/current, /api/model/reset",
-            "dataset": "/api/dataset/upload, /api/dataset/generate, /api/dataset/info",
-            "config": "/api/config/learning-rate"
+            "authentication": {
+                "register": "POST /register",
+                "login": "POST /login",
+                "logout": "POST /logout"
+            },
+            "training_sessions": {
+                "create": "POST /api/training-sessions",
+                "list": "GET /api/training-sessions",
+                "get": "GET /api/training-sessions/{session_id}",
+                "update": "PUT /api/training-sessions/{session_id}",
+                "delete": "DELETE /api/training-sessions/{session_id}"
+            },
+            "training": {
+                "gradient_step": "GET /api/gradient/step",
+                "current_state": "GET /api/state/current",
+                "reset_model": "GET /api/model/reset"
+            },
+            "dataset": {
+                "upload": "POST /api/dataset/upload",
+                "generate": "POST /api/dataset/generate",
+                "info": "GET /api/dataset/info"
+            }
         }
     }
 
 
 @app.get("/health")
-async def health():
-    """Health check pentru monitoring"""
+async def health() -> dict:
+    """
+    Health check endpoint for monitoring.
+    
+    Returns:
+        Status indication
+    """
     return {"status": "healthy"}
 
 
 @app.post("/api/reset")
 @app.get("/api/reset")
-async def reset_all():
-    """Resetează complet aplicația - wrapper care apelează reset-ul din dataset."""
-    from app.api.training import state
+async def reset_all() -> dict:
+    """
+    Reset application state.
     
+    Clears all training data and resets model parameters.
+    
+    Returns:
+        Success message
+    """
+    from app.api.training import state
+
     state["data"]["x"] = None
     state["data"]["y"] = None
     state["model"]["w"] = 1.0
@@ -62,7 +120,7 @@ async def reset_all():
     state["history"]["b"] = []
     state["config"]["lr"] = 0.01
     state["config"]["current_epoch"] = 0
-    
+
     return {"message": "Complete reset successful"}
 
 

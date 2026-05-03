@@ -1,8 +1,9 @@
 """
 Pydantic schemas pentru request/response models
 """
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import List, Optional
+from datetime import datetime
 
 
 class DatasetUploadResponse(BaseModel):
@@ -133,25 +134,16 @@ class UserResponse(BaseModel):
     id: int
     email: str
     username: str
-    created_at: str  # DateTime as ISO format string
+    created_at: datetime  # DateTime object (auto-serialized to ISO format in JSON)
     
-    class Config:
-        from_attributes = True  # For SQLAlchemy model conversion
-        json_schema_extra = {
-            "example": {
-                "id": 1,
-                "email": "user@example.com",
-                "username": "john_doe",
-                "created_at": "2024-05-03T10:30:00"
-            }
-        }
+    model_config = ConfigDict(from_attributes=True)
 
 
 class UserLogin(BaseModel):
     """
     Schema for user login request.
     """
-    username: str
+    email: str
     password: str
 
 
@@ -211,38 +203,11 @@ class TrainingSessionResponse(BaseModel):
     model_parameters: Optional[dict] = None
     loss_history: Optional[List[float]] = None
     metrics: Optional[dict] = None
-    created_at: str  # DateTime as ISO format string
-    updated_at: str  # DateTime as ISO format string
+    created_at: datetime  # DateTime object (auto-serialized to ISO format in JSON)
+    updated_at: datetime  # DateTime object (auto-serialized to ISO format in JSON)
     user: Optional[UserResponse] = None  # Nested user data
     
-    class Config:
-        from_attributes = True  # For SQLAlchemy model conversion
-        json_schema_extra = {
-            "example": {
-                "id": 1,
-                "user_id": 1,
-                "algorithm_type": "linear_regression",
-                "dataset": [
-                    {"x": 1.0, "y": 2.5},
-                    {"x": 2.0, "y": 4.8}
-                ],
-                "hyperparameters": {
-                    "learning_rate": 0.01,
-                    "epochs": 50
-                },
-                "model_parameters": {
-                    "weights": [1.2, 0.5],
-                    "bias": 0.3
-                },
-                "loss_history": [0.5, 0.45, 0.42],
-                "metrics": {
-                    "mse": 0.02,
-                    "r2": 0.95
-                },
-                "created_at": "2024-05-03T10:30:00",
-                "updated_at": "2024-05-03T10:35:00"
-            }
-        }
+    model_config = ConfigDict(from_attributes=True)
 
 
 class FreezeStateResponse(BaseModel):

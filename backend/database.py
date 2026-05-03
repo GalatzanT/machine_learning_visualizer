@@ -8,9 +8,14 @@ initialization.
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 from typing import Generator
+import os
+from dotenv import load_dotenv
 
-# Database URL - SQLite local file
-DATABASE_URL = "sqlite:///./ml_app.db"
+# Load environment variables from .env file
+load_dotenv()
+
+# Database URL from environment or default SQLite
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./ml_app.db")
 
 # Create SQLAlchemy engine
 engine = create_engine(
