@@ -1,4 +1,4 @@
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from "../hooks/useAuth";
 
 export function TopNav({ setCurrentPage }) {
   const auth = useAuth();
@@ -20,7 +20,7 @@ export function TopNav({ setCurrentPage }) {
             <button
               onClick={() => {
                 auth.logout();
-                setCurrentPage('training');
+                setCurrentPage("training");
               }}
               style={styles.logoutButton}
             >
@@ -30,13 +30,13 @@ export function TopNav({ setCurrentPage }) {
         ) : (
           <div style={styles.buttonsContainer}>
             <button
-              onClick={() => setCurrentPage('login')}
+              onClick={() => setCurrentPage("login")}
               style={styles.signInButton}
             >
               Sign In
             </button>
             <button
-              onClick={() => setCurrentPage('register')}
+              onClick={() => setCurrentPage("register")}
               style={styles.signUpButton}
             >
               Sign Up
@@ -50,50 +50,49 @@ export function TopNav({ setCurrentPage }) {
 
 const styles = {
   authContainer: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '16px',
+    display: "flex",
+    alignItems: "center",
+    gap: "16px",
   },
   welcomeText: {
-    fontSize: '14px',
-    color: '#4a5568',
+    fontSize: "14px",
+    color: "#4a5568",
   },
   logoutButton: {
-    background: '#FFFFFF',
-    color: '#FF6B6B',
-    border: '1px solid #FF6B6B',
-    padding: '8px 24px',
-    borderRadius: '8px',
-    fontWeight: '500',
-    cursor: 'pointer',
-    fontSize: '14px',
-    transition: 'all 0.2s ease',
+    background: "#FFFFFF",
+    color: "#FF6B6B",
+    border: "1px solid #FF6B6B",
+    padding: "8px 24px",
+    borderRadius: "8px",
+    fontWeight: "500",
+    cursor: "pointer",
+    fontSize: "14px",
+    transition: "all 0.2s ease",
   },
   buttonsContainer: {
-    display: 'flex',
-    gap: '12px',
+    display: "flex",
+    gap: "12px",
   },
   signInButton: {
-    background: '#FFFFFF',
-    color: '#0066CC',
-    border: '1px solid #0066CC',
-    padding: '8px 24px',
-    borderRadius: '8px',
-    fontWeight: '500',
-    cursor: 'pointer',
-    fontSize: '14px',
-    transition: 'all 0.2s ease',
+    background: "#FFFFFF",
+    color: "#0066CC",
+    border: "1px solid #0066CC",
+    padding: "8px 24px",
+    borderRadius: "8px",
+    fontWeight: "500",
+    cursor: "pointer",
+    fontSize: "14px",
+    transition: "all 0.2s ease",
   },
   signUpButton: {
-    background: '#0066CC',
-    color: '#FFFFFF',
-    border: 'none',
-    padding: '8px 24px',
-    borderRadius: '8px',
-    fontWeight: '500',
-    cursor: 'pointer',
-    fontSize: '14px',
-    transition: 'all 0.2s ease',
+    background: "#0066CC",
+    color: "#FFFFFF",
+    border: "none",
+    padding: "8px 24px",
+    borderRadius: "8px",
+    fontWeight: "500",
+    cursor: "pointer",
+    fontSize: "14px",
+    transition: "all 0.2s ease",
   },
 };
-
