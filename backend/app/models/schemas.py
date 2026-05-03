@@ -100,6 +100,151 @@ class GradientStepResponse(BaseModel):
     step_size: float
 
 
+# ============================================================================
+# User Authentication Schemas
+# ============================================================================
+
+class UserCreate(BaseModel):
+    """
+    Schema for creating a new user account.
+    
+    Used for registration requests.
+    """
+    email: str
+    username: str
+    password: str
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "email": "user@example.com",
+                "username": "john_doe",
+                "password": "SecurePassword123!"
+            }
+        }
+
+
+class UserResponse(BaseModel):
+    """
+    Schema for user response data.
+    
+    Used for API responses, excludes sensitive information like password.
+    """
+    id: int
+    email: str
+    username: str
+    created_at: str  # DateTime as ISO format string
+    
+    class Config:
+        from_attributes = True  # For SQLAlchemy model conversion
+        json_schema_extra = {
+            "example": {
+                "id": 1,
+                "email": "user@example.com",
+                "username": "john_doe",
+                "created_at": "2024-05-03T10:30:00"
+            }
+        }
+
+
+class UserLogin(BaseModel):
+    """
+    Schema for user login request.
+    """
+    username: str
+    password: str
+
+
+# ============================================================================
+# Training Session Schemas
+# ============================================================================
+
+class TrainingSessionCreate(BaseModel):
+    """
+    Schema for creating a new training session.
+    
+    Used when starting a new model training.
+    """
+    algorithm_type: str  # linear_regression, logistic_regression, knn, svm, decision_tree
+    dataset: List[dict]  # List of {x: float, y: float}
+    hyperparameters: dict  # {learning_rate: 0.01, epochs: 50, k: 5, etc.}
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "algorithm_type": "linear_regression",
+                "dataset": [
+                    {"x": 1.0, "y": 2.5},
+                    {"x": 2.0, "y": 4.8},
+                    {"x": 3.0, "y": 6.9}
+                ],
+                "hyperparameters": {
+                    "learning_rate": 0.01,
+                    "epochs": 50
+                }
+            }
+        }
+
+
+class TrainingSessionUpdate(BaseModel):
+    """
+    Schema for updating training session results.
+    
+    Used after training completes to store results.
+    """
+    model_parameters: Optional[dict] = None  # {weights: [...], bias: 0.5}
+    loss_history: Optional[List[float]] = None  # [0.5, 0.45, 0.42, ...]
+    metrics: Optional[dict] = None  # {mse: 0.02, r2: 0.95, accuracy: 0.92}
+
+
+class TrainingSessionResponse(BaseModel):
+    """
+    Schema for training session response.
+    
+    Complete training session information for API responses.
+    """
+    id: int
+    user_id: int
+    algorithm_type: str
+    dataset: List[dict]
+    hyperparameters: dict
+    model_parameters: Optional[dict] = None
+    loss_history: Optional[List[float]] = None
+    metrics: Optional[dict] = None
+    created_at: str  # DateTime as ISO format string
+    updated_at: str  # DateTime as ISO format string
+    user: Optional[UserResponse] = None  # Nested user data
+    
+    class Config:
+        from_attributes = True  # For SQLAlchemy model conversion
+        json_schema_extra = {
+            "example": {
+                "id": 1,
+                "user_id": 1,
+                "algorithm_type": "linear_regression",
+                "dataset": [
+                    {"x": 1.0, "y": 2.5},
+                    {"x": 2.0, "y": 4.8}
+                ],
+                "hyperparameters": {
+                    "learning_rate": 0.01,
+                    "epochs": 50
+                },
+                "model_parameters": {
+                    "weights": [1.2, 0.5],
+                    "bias": 0.3
+                },
+                "loss_history": [0.5, 0.45, 0.42],
+                "metrics": {
+                    "mse": 0.02,
+                    "r2": 0.95
+                },
+                "created_at": "2024-05-03T10:30:00",
+                "updated_at": "2024-05-03T10:35:00"
+            }
+        }
+
+
 class FreezeStateResponse(BaseModel):
     model: dict
     loss: float
