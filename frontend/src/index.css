@@ -18,6 +18,12 @@ body {
 #root {
   min-height: 100vh;
   width: 100%;
+  padding: 0;
+}
+
+main {
+  background: #F8FAFC;
+  min-height: 100vh;
   padding: 15px;
 }
 
@@ -45,6 +51,40 @@ h1 {
   padding: 20px;
   background: #f9f9f9;
   border-radius: 8px;
+}
+
+.topnav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background: #FFFFFF;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 0 48px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10;
+}
+
+.topnav-logo {
+  font-weight: bold;
+  color: #0066CC;
+  font-size: 16px;
+  white-space: nowrap;
+}
+
+.topnav-center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #1a202c;
+  font-size: 14px;
+}
+
+.topnav-right {
+  flex: 1;
 }
 
 .control-group {
@@ -235,7 +275,7 @@ table {
     padding: 40px;
   }
   
-  .charts {
+.charts {
     gap: 30px
 @media (max-width: 968px) {
   .charts {
