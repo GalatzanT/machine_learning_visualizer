@@ -18,7 +18,7 @@ export function LoginPage({ setCurrentPage }) {
     try {
       const response = await loginUser(email, password);
       auth.login(response.user, response.access_token);
-      setCurrentPage("training");
+      setCurrentPage("training-linear");
     } catch (err) {
       setError(err.message);
     } finally {

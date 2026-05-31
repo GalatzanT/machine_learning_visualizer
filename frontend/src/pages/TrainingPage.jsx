@@ -130,11 +130,6 @@ export function TrainingPage() {
 
   return (
     <div className="app">
-      <h1>{TEXT.APP_TITLE}</h1>
-      <p style={{ textAlign: "center", color: "#666", marginTop: "-10px" }}>
-        {TEXT.APP_SUBTITLE}
-      </p>
-
       {!dataset && (
         <div style={{ textAlign: "center", padding: "60px", color: "#999" }}>
           <h2>{TEXT.LOAD_DATASET_PROMPT}</h2>

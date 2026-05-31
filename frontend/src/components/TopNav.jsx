@@ -10,13 +10,22 @@ export function TopNav({ setCurrentPage, currentPage }) {
       </div>
       <div className="topnav-center">
         <span
-          onClick={() => setCurrentPage("training")}
+          onClick={() => setCurrentPage("home")}
           style={{
             ...styles.navLink,
-            ...(currentPage === "training" ? styles.navLinkActive : {}),
+            ...(currentPage === "home" ? styles.navLinkActive : {}),
           }}
         >
-          Training
+          Home
+        </span>
+        <span
+          onClick={() => setCurrentPage("training-linear")}
+          style={{
+            ...styles.navLink,
+            ...(currentPage === "training-linear" ? styles.navLinkActive : {}),
+          }}
+        >
+          Linear Regression
         </span>
         {auth.token && (
           <span
@@ -41,7 +50,7 @@ export function TopNav({ setCurrentPage, currentPage }) {
             <button
               onClick={() => {
                 auth.logout();
-                setCurrentPage("training");
+                setCurrentPage("home");
               }}
               style={styles.logoutButton}
             >
