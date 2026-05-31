@@ -38,6 +38,17 @@ export function TopNav({ setCurrentPage, currentPage }) {
         >
           Logistic Regression
         </span>
+        <span
+          onClick={() => setCurrentPage("training-knn")}
+          style={{
+            ...styles.navLink,
+            ...(currentPage === "training-knn"
+              ? styles.navLinkActive
+              : {}),
+          }}
+        >
+          KNN
+        </span>
         {auth.token && (
           <span
             onClick={() => setCurrentPage("saved-sessions")}

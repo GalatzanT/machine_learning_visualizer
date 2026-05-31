@@ -45,14 +45,17 @@ export function HomePage({ setCurrentPage }) {
             <button style={styles.cardButton}>Learn More →</button>
           </div>
 
-          {/* KNN Card (Coming Soon) */}
-          <div style={{ ...styles.card, opacity: 0.6 }}>
+          {/* KNN Card */}
+          <div
+            style={styles.card}
+            onClick={() => setCurrentPage("training-knn")}
+          >
             <div style={styles.cardIcon}>🔍</div>
             <h3 style={styles.cardTitle}>K-Nearest Neighbors</h3>
             <p style={styles.cardDescription}>
-              Instance-based learning. Coming soon.
+              Instance-based learning. Classify by finding and voting with nearest neighbors.
             </p>
-            <div style={styles.comingSoon}>Coming Soon</div>
+            <button style={styles.cardButton}>Learn More →</button>
           </div>
         </div>
       </div>
