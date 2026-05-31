@@ -31,14 +31,18 @@ export function HomePage({ setCurrentPage }) {
             <button style={styles.cardButton}>Learn More →</button>
           </div>
 
-          {/* Logistic Regression Card (Coming Soon) */}
-          <div style={{ ...styles.card, opacity: 0.6 }}>
+          {/* Logistic Regression Card */}
+          <div
+            style={styles.card}
+            onClick={() => setCurrentPage("training-logistic")}
+          >
             <div style={styles.cardIcon}>🎯</div>
             <h3 style={styles.cardTitle}>Logistic Regression</h3>
             <p style={styles.cardDescription}>
-              Binary classification. Coming soon.
+              Binary classification with sigmoid decision boundary and
+              probability-based predictions.
             </p>
-            <div style={styles.comingSoon}>Coming Soon</div>
+            <button style={styles.cardButton}>Learn More →</button>
           </div>
 
           {/* KNN Card (Coming Soon) */}

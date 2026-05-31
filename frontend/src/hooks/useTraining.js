@@ -122,6 +122,55 @@ export const useTraining = () => {
     }
   };
 
+  const handleNextEpoch = async () => {
+    if (!dataset) {
+      alert(TEXT.NO_DATASET);
+      return;
+    }
+
+    try {
+      const totalSamples = dataset.x.length;
+      let lastStepData = null;
+      let finalLoss = 0;
+
+      // Train through all samples in epoch
+      for (let i = 0; i < totalSamples; i++) {
+        const data = await trainingAPI.gradientStep();
+        lastStepData = data;
+        finalLoss = data.loss_after || 0;
+      }
+
+      // Update model with final step of epoch
+      if (lastStepData) {
+        setPreviousModel({ ...model });
+        setModel({ w: lastStepData.w_after, b: lastStepData.b_after });
+        setStepData(lastStepData);
+        setExplanations(lastStepData.explanations || []);
+        setCurrentEpoch(lastStepData.epoch);
+
+        setCurrentModelParameters({
+          w: lastStepData.w_after,
+          b: lastStepData.b_after,
+        });
+
+        // Add final loss to history
+        setLossHistory(prev => [...prev, finalLoss]);
+
+        // Update metrics
+        setCurrentMetrics({
+          final_loss: finalLoss,
+          current_epoch: lastStepData.epoch,
+          samples: totalSamples,
+        });
+      }
+      setFreezeMode(false);
+    } catch (error) {
+      alert(
+        `${TEXT.ERROR_MESSAGE}: ${error.response?.data?.detail || error.message}`,
+      );
+    }
+  };
+
   const handleLearningRateChange = async (newLr) => {
     setLearningRate(newLr);
     try {
@@ -316,6 +365,7 @@ export const useTraining = () => {
     // Handlers
     handleFileUpload,
     handleGenerateDataset,
+    handleNextEpoch,
     handleGradientStep,
     handleLearningRateChange,
     handleFreezeExplain,

@@ -60,6 +60,7 @@ export function TrainingPage() {
     fileInputRef,
     handleFileUpload,
     handleGenerateDataset,
+    handleNextEpoch,
     handleGradientStep,
     handleLearningRateChange,
     handleFreezeExplain,
@@ -128,6 +129,14 @@ export function TrainingPage() {
     }
   };
 
+  const nextEpoch = async () => {
+    try {
+      await handleNextEpoch();
+    } catch (error) {
+      alert(error.message || "Failed to train next epoch");
+    }
+  };
+
   return (
     <div className="app">
       {!dataset && (
@@ -187,11 +196,11 @@ export function TrainingPage() {
                 <h3 style={styles.cardTitle}>🎮 Training Controls</h3>
                 <div style={styles.buttonColumn}>
                   <button
-                    onClick={handleGradientStep}
+                    onClick={nextEpoch}
                     disabled={!dataset}
                     style={styles.btnPrimary}
                   >
-                    ▶ Next Step
+                    ▶ Next Epoch
                   </button>
                   <button
                     onClick={handleFreezeExplain}

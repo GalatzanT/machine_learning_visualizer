@@ -27,6 +27,17 @@ export function TopNav({ setCurrentPage, currentPage }) {
         >
           Linear Regression
         </span>
+        <span
+          onClick={() => setCurrentPage("training-logistic")}
+          style={{
+            ...styles.navLink,
+            ...(currentPage === "training-logistic"
+              ? styles.navLinkActive
+              : {}),
+          }}
+        >
+          Logistic Regression
+        </span>
         {auth.token && (
           <span
             onClick={() => setCurrentPage("saved-sessions")}

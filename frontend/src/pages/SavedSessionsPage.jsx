@@ -149,7 +149,7 @@ export function SavedSessionsPage({ setCurrentPage }) {
             example: `y = ${session.model_parameters?.w || 0}*x + ${session.model_parameters?.b || 0}`,
           },
         };
-      } else if (session.algorithm_type === "logistic_regression") {
+      } else if (session.algorithm_type.toLowerCase().includes("logistic")) {
         modelJSON = {
           algorithm: "logistic_regression",
           created_at: session.created_at,

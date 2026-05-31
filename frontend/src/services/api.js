@@ -66,3 +66,36 @@ export const trainingAPI = {
     return response.data;
   },
 };
+
+export const logisticTrainingAPI = {
+  generateDataset: async (datasetType) => {
+    const response = await axios.get(
+      `${API_URL}/api/datasets/logistic?dataset_type=${datasetType}`,
+    );
+    return response.data;
+  },
+
+  startTraining: async (dataset, learningRate) => {
+    const response = await axios.post(
+      `${API_URL}/api/logistic-training/start`,
+      {
+        dataset,
+        learning_rate: learningRate,
+      },
+    );
+    return response.data;
+  },
+
+  stepTraining: async () => {
+    const response = await axios.post(
+      `${API_URL}/api/logistic-training/step`,
+      {},
+    );
+    return response.data;
+  },
+
+  getState: async () => {
+    const response = await axios.get(`${API_URL}/api/logistic-training/state`);
+    return response.data;
+  },
+};
