@@ -73,6 +73,19 @@ export function TopNav({ setCurrentPage, currentPage }) {
         </span>
         {auth.token && (
           <span
+            onClick={() => setCurrentPage("compare")}
+            style={{
+              ...styles.navLink,
+              ...(currentPage === "compare"
+                ? styles.navLinkActive
+                : {}),
+            }}
+          >
+            Compare
+          </span>
+        )}
+        {auth.token && (
+          <span
             onClick={() => setCurrentPage("saved-sessions")}
             style={{
               ...styles.navLink,

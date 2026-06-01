@@ -251,6 +251,22 @@ export function SavedSessionsPage({ setCurrentPage }) {
   return (
     <div style={styles.pageContainer}>
       <h1 style={styles.pageTitle}>Your Training Sessions</h1>
+      
+      <button
+        onClick={() => setCurrentPage("compare")}
+        style={{
+          marginBottom: "20px",
+          padding: "10px 16px",
+          backgroundColor: "#667EEA",
+          color: "white",
+          border: "none",
+          borderRadius: "4px",
+          cursor: "pointer",
+          fontSize: "14px",
+        }}
+      >
+        📊 Compare Two Sessions
+      </button>
 
       {error && <div style={styles.errorMessage}>{error}</div>}
 
