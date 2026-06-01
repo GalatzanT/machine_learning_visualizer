@@ -283,7 +283,10 @@ export function SavedSessionsPage({ setCurrentPage }) {
           {sessions.map((session) => (
             <div key={session.id} style={styles.sessionCard}>
               <div style={styles.cardHeader}>
-                <h3 style={styles.cardTitle}>{session.algorithm_type}</h3>
+                <h3 style={styles.cardTitle}>{session.name || session.algorithm_type}</h3>
+                <p style={{ fontSize: "12px", color: "#718096", margin: "4px 0 0 0" }}>
+                  {session.algorithm_type}
+                </p>
               </div>
 
               <div style={styles.cardContent}>

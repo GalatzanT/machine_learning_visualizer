@@ -129,40 +129,26 @@ export const useTraining = () => {
     }
 
     try {
-      const totalSamples = dataset.x.length;
-      let lastStepData = null;
-      let finalLoss = 0;
+      const data = await trainingAPI.gradientStep();
 
-      // Train through all samples in epoch
-      for (let i = 0; i < totalSamples; i++) {
-        const data = await trainingAPI.gradientStep();
-        lastStepData = data;
-        finalLoss = data.loss_after || 0;
-      }
+      setPreviousModel({ ...model });
+      setModel({ w: data.w_after, b: data.b_after });
+      setStepData(data);
+      setExplanations(data.explanations || []);
+      setCurrentEpoch(data.epoch);
 
-      // Update model with final step of epoch
-      if (lastStepData) {
-        setPreviousModel({ ...model });
-        setModel({ w: lastStepData.w_after, b: lastStepData.b_after });
-        setStepData(lastStepData);
-        setExplanations(lastStepData.explanations || []);
-        setCurrentEpoch(lastStepData.epoch);
+      setCurrentModelParameters({
+        w: data.w_after,
+        b: data.b_after,
+      });
 
-        setCurrentModelParameters({
-          w: lastStepData.w_after,
-          b: lastStepData.b_after,
-        });
+      setLossHistory(prev => [...prev, data.loss_after || 0]);
 
-        // Add final loss to history
-        setLossHistory(prev => [...prev, finalLoss]);
-
-        // Update metrics
-        setCurrentMetrics({
-          final_loss: finalLoss,
-          current_epoch: lastStepData.epoch,
-          samples: totalSamples,
-        });
-      }
+      setCurrentMetrics({
+        final_loss: data.loss_after || 0,
+        current_epoch: data.epoch,
+        samples: dataset.x.length,
+      });
       setFreezeMode(false);
     } catch (error) {
       alert(

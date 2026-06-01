@@ -122,20 +122,26 @@ export default function CompareSessionsPage() {
     ctx.lineTo(sx(x0), H - p);
     ctx.stroke();
 
-    // Data points
-    [A, B].forEach((S, i) => {
+    // Data points - both datasets with distinct colors
+    const DSCOL = { A0: "#4299E1", A1: "#2B6CB0", B0: "#F56565", B1: "#C53030" };
+    [["A", A], ["B", B]].forEach(([tag, S]) => {
       const d = S.dataset;
       if (!d) return;
-      const pts = d.x
+      const list = d.x
         ? d.x.map((xv, idx) => ({ x: xv, y: d.y[idx] }))
         : Array.isArray(d)
         ? d
         : [];
-      ctx.fillStyle = (i ? C_B : C_A) + "55";
-      pts.forEach((o) => {
+      list.forEach((o) => {
+        const cls = o.y >= 0.5 ? 1 : 0;
+        const col = isLog ? DSCOL[tag + cls] : (tag === "A" ? C_A : C_B);
+        ctx.fillStyle = col;
+        ctx.strokeStyle = "#1A202C";
+        ctx.lineWidth = 0.5;
         ctx.beginPath();
-        ctx.arc(sx(o.x), sy(o.y), 3, 0, 7);
+        ctx.arc(sx(o.x), sy(isLog ? cls : o.y), 3.5, 0, 7);
         ctx.fill();
+        ctx.stroke();
       });
     });
 
@@ -388,9 +394,22 @@ export default function CompareSessionsPage() {
           <div>
             <div style={{ fontSize: "14px", fontWeight: "600", marginBottom: "8px" }}>
               {isLog ? "Sigmoid curves" : "Regression lines"}
-              <div style={{ display: "flex", gap: "16px", fontSize: "12px", fontWeight: "400", marginTop: "4px" }}>
-                <span style={{ color: C_A }}>■ A</span>
-                <span style={{ color: C_B }}>■ B</span>
+              <div style={{ display: "flex", gap: "16px", fontSize: "12px", fontWeight: "400", marginTop: "4px", flexWrap: "wrap" }}>
+                <span style={{ color: C_A }}>■ Model A</span>
+                <span style={{ color: C_B }}>■ Model B</span>
+                {isLog ? (
+                  <>
+                    <span style={{ color: "#4299E1" }}>● A class 0</span>
+                    <span style={{ color: "#2B6CB0" }}>● A class 1</span>
+                    <span style={{ color: "#F56565" }}>● B class 0</span>
+                    <span style={{ color: "#C53030" }}>● B class 1</span>
+                  </>
+                ) : (
+                  <>
+                    <span style={{ color: C_A }}>● A data</span>
+                    <span style={{ color: C_B }}>● B data</span>
+                  </>
+                )}
               </div>
             </div>
             <canvas
