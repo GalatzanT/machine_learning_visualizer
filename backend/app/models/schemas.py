@@ -157,6 +157,7 @@ class TrainingSessionCreate(BaseModel):
     
     Used when starting a new model training.
     """
+    name: Optional[str] = None
     algorithm_type: str  # linear_regression, logistic_regression, knn, svm, decision_tree
     dataset: List[dict]  # List of {x: float, y: float}
     hyperparameters: dict  # {learning_rate: 0.01, epochs: 50, k: 5, etc.}
@@ -200,6 +201,7 @@ class TrainingSessionResponse(BaseModel):
     """
     id: int
     user_id: int
+    name: Optional[str] = None
     algorithm_type: str
     dataset: List[dict]
     hyperparameters: dict

@@ -74,6 +74,7 @@ async def create_training_session(
     # Create new training session
     new_session = TrainingSession(
     user_id=user_id,
+    name=session_create.name,
     algorithm_type=session_create.algorithm_type,
     dataset=session_create.dataset,
     hyperparameters=session_create.hyperparameters,

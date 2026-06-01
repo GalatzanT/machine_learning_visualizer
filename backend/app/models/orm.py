@@ -119,6 +119,7 @@ class TrainingSession(Base):
     __tablename__ = "training_sessions"
     
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    name = Column(String(255), nullable=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
     algorithm_type = Column(String(50), nullable=False)
     dataset = Column(JSON, nullable=False)

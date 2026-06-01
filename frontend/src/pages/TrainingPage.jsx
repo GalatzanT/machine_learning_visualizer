@@ -88,6 +88,7 @@ export function TrainingPage() {
       }));
 
       const sessionData = {
+        name: sessionName || "Linear Regression Training",
         algorithm_type: "Linear Regression",
         dataset: formattedDataset,
         hyperparameters: { learning_rate: learningRate },
@@ -341,6 +342,7 @@ export function TrainingPage() {
           )}
         </>
       )}
+
 
       {/* SAVE DIALOG */}
       {showSaveDialog && (
