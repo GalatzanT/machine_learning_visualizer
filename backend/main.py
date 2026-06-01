@@ -10,7 +10,7 @@ FastAPI application for machine learning education system with:
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from database import init_db
-from app.routers import auth, datasets, logistic_training, training_sessions, knn_training, knn_datasets
+from app.routers import auth, datasets, logistic_training, training_sessions, knn_training, knn_datasets, dt_interactive
 from app.api import training, dataset
 
 # Initialize database
@@ -52,6 +52,9 @@ app.include_router(logistic_training.router)
 # KNN routes
 app.include_router(knn_training.router)
 app.include_router(knn_datasets.router)
+
+# Decision Tree Interactive routes
+app.include_router(dt_interactive.router)
 
 # Legacy routes for dataset and training
 app.include_router(training.router)

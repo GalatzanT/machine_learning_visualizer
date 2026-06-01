@@ -49,6 +49,17 @@ export function TopNav({ setCurrentPage, currentPage }) {
         >
           KNN
         </span>
+        <span
+          onClick={() => setCurrentPage("decision-tree")}
+          style={{
+            ...styles.navLink,
+            ...(currentPage === "decision-tree"
+              ? styles.navLinkActive
+              : {}),
+          }}
+        >
+          Decision Tree
+        </span>
         {auth.token && (
           <span
             onClick={() => setCurrentPage("saved-sessions")}

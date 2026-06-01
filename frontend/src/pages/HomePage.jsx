@@ -57,6 +57,19 @@ export function HomePage({ setCurrentPage }) {
             </p>
             <button style={styles.cardButton}>Learn More →</button>
           </div>
+
+          {/* Decision Tree Card */}
+          <div
+            style={styles.card}
+            onClick={() => setCurrentPage("decision-tree")}
+          >
+            <div style={styles.cardIcon}>🌳</div>
+            <h3 style={styles.cardTitle}>Decision Tree</h3>
+            <p style={styles.cardDescription}>
+              Watch the tree grow split by split. See Gini impurity drop and information gain guide each decision.
+            </p>
+            <button style={styles.cardButton}>Learn More →</button>
+          </div>
         </div>
       </div>
 
