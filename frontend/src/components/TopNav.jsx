@@ -60,6 +60,17 @@ export function TopNav({ setCurrentPage, currentPage }) {
         >
           Decision Tree
         </span>
+        <span
+          onClick={() => setCurrentPage("kmeans")}
+          style={{
+            ...styles.navLink,
+            ...(currentPage === "kmeans"
+              ? styles.navLinkActive
+              : {}),
+          }}
+        >
+          K-Means
+        </span>
         {auth.token && (
           <span
             onClick={() => setCurrentPage("saved-sessions")}

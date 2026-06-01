@@ -6,6 +6,7 @@ import { TrainingPage } from "./pages/TrainingPage";
 import { LogisticRegressionPage } from "./pages/LogisticRegressionPage";
 import { KNNPage } from "./pages/KNNPage";
 import DecisionTreeInteractivePage from "./pages/DecisionTreeInteractivePage";
+import KMeansInteractivePage from "./pages/KMeansInteractivePage";
 import { LoginPage } from "./pages/LoginPage";
 import { RegisterPage } from "./pages/RegisterPage";
 import { SavedSessionsPage } from "./pages/SavedSessionsPage";
@@ -90,6 +91,17 @@ function App() {
         <TopNav setCurrentPage={setCurrentPage} currentPage={currentPage} />
         <main style={{ paddingTop: "80px" }}>
           <DecisionTreeInteractivePage setCurrentPage={setCurrentPage} />
+        </main>
+      </AuthProvider>
+    );
+  }
+
+  if (currentPage === "kmeans") {
+    return (
+      <AuthProvider>
+        <TopNav setCurrentPage={setCurrentPage} currentPage={currentPage} />
+        <main style={{ paddingTop: "80px" }}>
+          <KMeansInteractivePage setCurrentPage={setCurrentPage} />
         </main>
       </AuthProvider>
     );

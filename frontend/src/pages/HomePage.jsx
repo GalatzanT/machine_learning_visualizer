@@ -70,6 +70,19 @@ export function HomePage({ setCurrentPage }) {
             </p>
             <button style={styles.cardButton}>Learn More →</button>
           </div>
+
+          {/* K-Means Card */}
+          <div
+            style={styles.card}
+            onClick={() => setCurrentPage("kmeans")}
+          >
+            <div style={styles.cardIcon}>🎯</div>
+            <h3 style={styles.cardTitle}>K-Means Clustering</h3>
+            <p style={styles.cardDescription}>
+              Unsupervised learning. Watch centroids move as the algorithm discovers natural groups in your data.
+            </p>
+            <button style={styles.cardButton}>Learn More →</button>
+          </div>
         </div>
       </div>
 
